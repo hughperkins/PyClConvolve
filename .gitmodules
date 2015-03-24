@@ -1,0 +1,3 @@
+[submodule "ClConvolve"]
+	path = ClConvolve
+	url = https://github.com/hughperkins/ClConvolve.git
