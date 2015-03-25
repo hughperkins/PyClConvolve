@@ -9,3 +9,9 @@ See [test_clconvolve.py](test_clconvolve.py) for an example of:
 * training the network using low-level net interface (`propagate`, `backprop`)
 * training the network using a higher-level interface (`NetLearner`)
 
+# Notes on how the wrapper works
+
+* [cClConvolve.pxd](cClConvolve.pxd) contains the definitions of the underlying ClConvolve c++ libraries classes
+* [PyClConvolve.pyx](PyClConvolve.pyx) contains Cython wrapper classes around the underlying c++ classes
+* [setup.py](setup.py) is a setup file for compiling the `PyClConvolve.pyx` Cython file
+
