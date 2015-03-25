@@ -9,18 +9,29 @@ PyClConvolve.NetdefToNet.createNetFromNetdef( net, "rt2-8c5-mp2-16c5-mp3-150n-10
 print( net.asString() )
  
 mnistFilePath = '../ClConvolve/data/mnist/t10k-dat.mat'
-dim = PyClConvolve.GenericLoader.getDimensions(mnistFilePath)
-print( dim )
+(N,planes,size) = PyClConvolve.GenericLoader.getDimensions(mnistFilePath)
+print( (N,planes,size) )
 
-images = array.array( 'B', [0] * (dim[0]*dim[1]*dim[2]*dim[2]) )
-labels = array.array('i',[0] * dim[0] )
-PyClConvolve.GenericLoader.load(mnistFilePath, images, labels, 0, 10 )
+N = 1280
+images = array.array( 'f', [0] * (N*planes*size*size) )
+labels = array.array('i',[0] * N )
+PyClConvolve.GenericLoader.load(mnistFilePath, images, labels, 0, N )
 
-print( len(images) )
-print( len(labels) )
+for i in range(N * planes * size * size):
+    images[i] = images[i] / 255.0 - 0.5
 
-for i in range(10):
-    print( labels[i] )
-
-
+net.setBatchSize(128)
+for i in range(12): 
+    net.propagate( images )
+    net.backPropFromLabels( 0.002, labels )
+    print( 'numright ' + str( net.calcNumRight( labels ) ) )
+#    print( 'loss ' + str( loss ) )
+ 
+netLearner = PyClConvolve.NetLearner( net )
+netLearner.setTrainingData( N, images, labels )
+netLearner.setTestingData( N, images, labels )
+netLearner.setSchedule( 12 )
+netLearner.setBatchSize( 128 )
+netLearner.learn( 0.002 )
+ 
 

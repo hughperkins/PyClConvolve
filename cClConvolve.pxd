@@ -8,13 +8,29 @@ cdef extern from "NeuralNet.h":
         #void print()
         NeuralNet( int numPlanes, int size )
         string asString()
-    
+        void setBatchSize( int batchSize )
+        void propagate( const float *images)
+        void backPropFromLabels( float learningRate, const int *labels)
+        void backProp( float learningRate, const float *expectedResults)
+        int calcNumRight( const int *labels )
+
 cdef extern from "NetdefToNet.h":
     cdef cppclass NetdefToNet:
         @staticmethod
         bool createNetFromNetdef( NeuralNet *net, string netdef )
 
-#cdef extern from "NetLearner.h":
+cdef extern from "NetLearner.h":
+    cdef cppclass NetLearner[T]:
+        NetLearner( NeuralNet *net )
+        void setTrainingData( int Ntrain, T *trainData, int *trainLabels )
+        void setTestingData( int Ntest, T *testData, int *testLabels )
+        void setSchedule( int numEpochs )
+        void setDumpTimings( bool dumpTimings )
+        void setBatchSize( int batchSize )
+        void learn( float learningRate )
+        #void setSchedule( int numEpochs, int startEpoch )
+        # VIRTUAL void addPostEpochAction( PostEpochAction *action );
+        #void learn( float learningRate, float annealLearningRate )
 
 cdef extern from "GenericLoader.h":
     cdef cppclass GenericLoader:

@@ -1,5 +1,6 @@
 from cython cimport view
 from cpython cimport array as c_array
+from array import array
 cimport cClConvolve
 
 cdef class NeuralNet:
@@ -14,10 +15,40 @@ cdef class NeuralNet:
 #    def myprint(self):
 #        self.thisptr.print()
 
+    def setBatchSize( self, int batchSize ):
+        self.thisptr.setBatchSize( batchSize ) 
+    #def propagate( self, const unsigned char[:] images):
+    #    self.thisptr.propagate( &images[0] )
+    def propagate( self, const float[:] images):
+        self.thisptr.propagate( &images[0] )
+    def backPropFromLabels( self, float learningRate, int[:] labels):
+        return self.thisptr.backPropFromLabels( learningRate, &labels[0] ) 
+    def backProp( self, float learningRate, float[:] expectedResults):
+        return self.thisptr.backProp( learningRate, &expectedResults[0] )
+    def calcNumRight( self, int[:] labels ):
+        return self.thisptr.calcNumRight( &labels[0] )
+
 cdef class NetdefToNet:
     @staticmethod
     def createNetFromNetdef( NeuralNet neuralnet, netdef ):
         return cClConvolve.NetdefToNet.createNetFromNetdef( neuralnet.thisptr, netdef )
+
+cdef class NetLearner: 
+    cdef cClConvolve.NetLearner[float] *thisptr
+    def __cinit__( self, NeuralNet neuralnet ):
+        self.thisptr = new cClConvolve.NetLearner[float]( neuralnet.thisptr )
+    def setTrainingData( self, Ntrain, float[:] trainData, int[:] trainLabels ):
+        self.thisptr.setTrainingData( Ntrain, &trainData[0], &trainLabels[0] )
+    def setTestingData( self, Ntest, float[:] testData, int[:] testLabels ):
+        self.thisptr.setTestingData( Ntest, &testData[0], &testLabels[0] )
+    def setSchedule( self, numEpochs ):
+        self.thisptr.setSchedule( numEpochs )
+    def setDumpTimings( self, bint dumpTimings ):
+        self.thisptr.setDumpTimings( dumpTimings )
+    def setBatchSize( self, batchSize ):
+        self.thisptr.setBatchSize( batchSize )
+    def learn( self, learningRate ):
+        self.thisptr.learn( learningRate )
 
 cdef class GenericLoader:
     @staticmethod
@@ -28,12 +59,30 @@ cdef class GenericLoader:
         cClConvolve.GenericLoader.getDimensions( trainFilePath, &N, &planes, &size )
         # print( N )
         return (N,planes,size)
-    @staticmethod
-    def load( trainFilepath, unsigned char[:] images, int[:] labels, startN, numExamples ):
+    @staticmethod 
+    def loaduc( trainFilepath, unsigned char[:] images, int[:] labels, startN, numExamples ):
         #(N, planes, size) = getDimensions(trainFilepath)
         #images = view.array(shape=(N,planes,size,size),itemsize=1,
         #cdef unsigned char *images
         #cdef int *labels
         cClConvolve.GenericLoader.load( trainFilepath, &images[0], &labels[0], startN , numExamples )
         #return (images, labels)
+    @staticmethod 
+    def load( trainFilepath, float[:] images, int[:] labels, startN, numExamples ):
+        (N, planes, size) = GenericLoader.getDimensions(trainFilepath)
+        #images = view.array(shape=(N,planes,size,size),itemsize=1,
+        #cdef unsigned char *images
+        #cdef int *labels
+        #cdef unsigned char ucImages[numExamples * planes * size * size]
+        print( (N, planes, size ) )
+        cdef c_array.array ucImages = array('B', [0] * (numExamples * planes * size * size) )
+        cdef unsigned char[:] ucImagesMv = ucImages
+        cClConvolve.GenericLoader.load( trainFilepath, &ucImagesMv[0], &labels[0], startN , numExamples )
+        #return (images, labels)
+        cdef int i
+        cdef int total
+        total = numExamples * planes * size * size
+        print(total)
+        for i in range(total):
+            images[i] = ucImagesMv[i]
 
