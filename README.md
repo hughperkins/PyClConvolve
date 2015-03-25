@@ -6,8 +6,11 @@ Python wrapper for ClConvolve
 See [test_clconvolve.py](test_clconvolve.py) for an example of:
 * creating a network, with several layers
 * loading mnist data
-* training the network using low-level net interface (`propagate`, `backprop`)
 * training the network using a higher-level interface (`NetLearner`)
+
+For examples of using lower-level entrypoints, see [test_lowlevel.py](test_lowlevel.py):
+* creating layers directly
+* running epochs and forward/backprop directly
 
 # Notes on how the wrapper works
 

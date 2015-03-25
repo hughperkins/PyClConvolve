@@ -18,16 +18,6 @@ images = array.array( 'f', [0] * (N*planes*size*size) )
 labels = array.array('i',[0] * N )
 PyClConvolve.GenericLoader.load(mnistFilePath, images, labels, 0, N )
 
-#for i in range(N * planes * size * size):
-#    images[i] = images[i] / 255.0 - 0.5
-
-net.setBatchSize(128)
-for i in range(12): 
-    net.propagate( images )
-    net.backPropFromLabels( 0.002, labels )
-    print( 'numright ' + str( net.calcNumRight( labels ) ) )
-#    print( 'loss ' + str( loss ) )
- 
 netLearner = PyClConvolve.NetLearner( net )
 netLearner.setTrainingData( N, images, labels )
 netLearner.setTestingData( N, images, labels )
