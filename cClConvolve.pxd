@@ -10,7 +10,7 @@ from libcpp cimport bool
 cdef extern from "NeuralNet.h":
     cdef cppclass NeuralNet:
         #pass
-        #def NeuralNet()
+        NeuralNet()
         #void print()
         NeuralNet( int numPlanes, int size )
         string asString()
@@ -59,10 +59,10 @@ cdef extern from "NormalizationLayerMaker.h":
 
 cdef extern from "FullyConnectedMaker.h":
     cdef cppclass FullyConnectedMaker(LayerMaker2):
-        FullyConnectedMaker *numPlanes( float numPlanes )
-        FullyConnectedMaker *imageSize( float imageSize )
+        FullyConnectedMaker *numPlanes( int numPlanes )
+        FullyConnectedMaker *imageSize( int imageSize )
         FullyConnectedMaker *biased()
-        FullyConnectedMaker *biased(int _biased)
+        FullyConnectedMaker *biased(bint _biased)
         FullyConnectedMaker *linear()
         FullyConnectedMaker *tanh()
         FullyConnectedMaker *sigmoid()
@@ -70,5 +70,42 @@ cdef extern from "FullyConnectedMaker.h":
         @staticmethod
         FullyConnectedMaker *instance()
 
+cdef extern from "ConvolutionalMaker.h":
+    cdef cppclass ConvolutionalMaker(LayerMaker2):
+        ConvolutionalMaker *numFilters( int numFilters )
+        ConvolutionalMaker *filterSize( int imageSize )
+        ConvolutionalMaker *padZeros()
+        ConvolutionalMaker *padZeros(bint _padZeros)
+        ConvolutionalMaker *biased()
+        ConvolutionalMaker *biased(bint _biased)
+        ConvolutionalMaker *linear()
+        ConvolutionalMaker *tanh()
+        ConvolutionalMaker *sigmoid()
+        ConvolutionalMaker *relu()
+        @staticmethod
+        ConvolutionalMaker *instance()
 
+cdef extern from "PoolingMaker.h":
+    cdef cppclass PoolingMaker(LayerMaker2):
+        PoolingMaker *poolingSize( int _poolingsize )
+        PoolingMaker *padZeros( int _padZeros )
+        @staticmethod
+        PoolingMaker *instance()
+
+cdef extern from "LayerMaker.h":
+    cdef cppclass SquareLossMaker(LayerMaker2):
+        @staticmethod
+        SquareLossMaker *instance()
+
+cdef extern from "LayerMaker.h":
+    cdef cppclass SoftMaxMaker(LayerMaker2):
+        @staticmethod
+        SoftMaxMaker *instance()
+
+cdef extern from "InputLayerMaker.h":
+    cdef cppclass InputLayerMaker[T](LayerMaker2):
+        InputLayerMaker *numPlanes( int _numPlanes )
+        InputLayerMaker *imageSize( int _imageSize )
+        @staticmethod
+        InputLayerMaker *instance()
 

@@ -15,6 +15,9 @@ cdef class NeuralNet:
     def __cinit__(self, planes, size):
         self.thisptr = new cClConvolve.NeuralNet(planes, size)
 
+    def __cinit__(self):
+        self.thisptr = new cClConvolve.NeuralNet()
+
     def asString(self):
         return self.thisptr.asString()
 
@@ -144,5 +147,89 @@ cdef class FullyConnectedMaker(LayerMaker2):
     @staticmethod
     def instance():
         return FullyConnectedMaker()
+
+cdef class ConvolutionalMaker(LayerMaker2):
+    cdef cClConvolve.ConvolutionalMaker *thisptr
+    def __cinit__( self ):
+        self.thisptr = new cClConvolve.ConvolutionalMaker()
+        self.baseptr = self.thisptr
+    def numFilters( self, int _numFilters ):
+        self.thisptr.numFilters( _numFilters )
+        return self
+    def filterSize( self, int _filterSize ):
+        self.thisptr.filterSize( _filterSize )
+        return self
+    def padZeros(self):
+        self.thisptr.padZeros()
+        return self
+    def padZeros(self, bint _padZeros):
+        self.thisptr.padZeros( _padZeros )
+        return self
+    def biased(self):
+        self.thisptr.biased()
+        return self
+    def biased(self, bint _biased):
+        self.thisptr.biased( _biased )
+        return self
+    def linear(self):
+        self.thisptr.linear()
+        return self
+    def tanh(self):
+        self.thisptr.tanh()
+        return self
+    def sigmoid(self):
+        self.thisptr.sigmoid()
+        return self
+    def relu(self):
+        self.thisptr.relu()
+        return self
+    @staticmethod
+    def instance():
+        return ConvolutionalMaker()
+
+cdef class PoolingMaker(LayerMaker2):
+    cdef cClConvolve.PoolingMaker *thisptr
+    def __cinit__( self ):
+        self.thisptr = new cClConvolve.PoolingMaker()
+        self.baseptr = self.thisptr
+    def poolingSize( self, int _poolingSize ):
+        self.thisptr.poolingSize( _poolingSize )
+        return self
+    @staticmethod
+    def instance():
+        return PoolingMaker()
+
+cdef class SquareLossMaker(LayerMaker2):
+    cdef cClConvolve.SquareLossMaker *thisptr
+    def __cinit__( self ):
+        self.thisptr = new cClConvolve.SquareLossMaker()
+        self.baseptr = self.thisptr
+    @staticmethod
+    def instance():
+        return SquareLossMaker()
+
+cdef class SoftMaxMaker(LayerMaker2):
+    cdef cClConvolve.SoftMaxMaker *thisptr
+    def __cinit__( self ):
+        self.thisptr = new cClConvolve.SoftMaxMaker()
+        self.baseptr = self.thisptr
+    @staticmethod
+    def instance():
+        return SoftMaxMaker()
+
+cdef class InputLayerMaker(LayerMaker2):
+    cdef cClConvolve.InputLayerMaker[float] *thisptr
+    def __cinit__( self ):
+        self.thisptr = new cClConvolve.InputLayerMaker[float]()
+        self.baseptr = self.thisptr
+    def numPlanes( self, int _numPlanes ):
+        self.thisptr.numPlanes( _numPlanes )
+        return self
+    def imageSize( self, int _imageSize ):
+        self.thisptr.imageSize( _imageSize )
+        return self
+    @staticmethod
+    def instance():
+        return InputLayerMaker()
 
 
