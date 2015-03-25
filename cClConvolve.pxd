@@ -1,3 +1,9 @@
+# Copyright Hugh Perkins 2015
+#
+# This Source Code Form is subject to the terms of the Mozilla Public License, 
+# v. 2.0. If a copy of the MPL was not distributed with this file, You can 
+# obtain one at http://mozilla.org/MPL/2.0/.
+
 from libcpp.string cimport string
 from libcpp cimport bool
 
@@ -38,11 +44,4 @@ cdef extern from "GenericLoader.h":
         void getDimensions( string trainFilepath, int *p_numExamples, int *p_numPlanes, int *p_imageSize )
         @staticmethod
         void load( string trainFilepath, unsigned char *images, int *labels, int startN, int numExamples )
-
-#cdef extern from "mycpp.h":
-#    void sayName( string name )
-#    cdef cppclass MyClass:
-#        # MyClass();
- #        string warpName( string inName )
-
 
