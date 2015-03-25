@@ -33,8 +33,8 @@ cdef class NeuralNet:
         return self.thisptr.backProp( learningRate, &expectedResults[0] )
     def calcNumRight( self, int[:] labels ):
         return self.thisptr.calcNumRight( &labels[0] )
-    def addLayer( self, NormalizationLayerMaker normalizationLayerMaker ):
-        self.thisptr.addLayer( normalizationLayerMaker.thisptr )
+    def addLayer( self, LayerMaker2 layerMaker ):
+        self.thisptr.addLayer( layerMaker.baseptr )
 
 cdef class NetdefToNet:
     @staticmethod
@@ -94,10 +94,14 @@ cdef class GenericLoader:
         for i in range(total):
             images[i] = ucImagesMv[i]
 
-cdef class NormalizationLayerMaker:
+cdef class LayerMaker2:
+    cdef cClConvolve.LayerMaker2 *baseptr
+
+cdef class NormalizationLayerMaker(LayerMaker2):
     cdef cClConvolve.NormalizationLayerMaker *thisptr
     def __cinit__( self ):
         self.thisptr = new cClConvolve.NormalizationLayerMaker()
+        self.baseptr = self.thisptr
     def translate( self, float _translate ):
         self.thisptr.translate( _translate )
         return self
@@ -107,4 +111,38 @@ cdef class NormalizationLayerMaker:
     @staticmethod
     def instance():
         return NormalizationLayerMaker()
+
+cdef class FullyConnectedMaker(LayerMaker2):
+    cdef cClConvolve.FullyConnectedMaker *thisptr
+    def __cinit__( self ):
+        self.thisptr = new cClConvolve.FullyConnectedMaker()
+        self.baseptr = self.thisptr
+    def numPlanes( self, int _numPlanes ):
+        self.thisptr.numPlanes( _numPlanes )
+        return self
+    def imageSize( self, int _imageSize ):
+        self.thisptr.imageSize( _imageSize )
+        return self
+    def biased(self):
+        self.thisptr.biased()
+        return self
+    def biased(self, int _biased):
+        self.thisptr.biased( _biased )
+        return self
+    def linear(self):
+        self.thisptr.linear()
+        return self
+    def tanh(self):
+        self.thisptr.tanh()
+        return self
+    def sigmoid(self):
+        self.thisptr.sigmoid()
+        return self
+    def relu(self):
+        self.thisptr.relu()
+        return self
+    @staticmethod
+    def instance():
+        return FullyConnectedMaker()
+
 

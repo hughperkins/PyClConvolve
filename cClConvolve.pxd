@@ -19,7 +19,7 @@ cdef extern from "NeuralNet.h":
         void backPropFromLabels( float learningRate, const int *labels)
         void backProp( float learningRate, const float *expectedResults)
         int calcNumRight( const int *labels )
-        void addLayer( NormalizationLayerMaker *maker )
+        void addLayer( LayerMaker2 *maker )
 
 cdef extern from "NetdefToNet.h":
     cdef cppclass NetdefToNet:
@@ -46,10 +46,29 @@ cdef extern from "GenericLoader.h":
         @staticmethod
         void load( string trainFilepath, unsigned char *images, int *labels, int startN, int numExamples )
 
+cdef extern from "LayerMaker.h":
+    cdef cppclass LayerMaker2:
+        pass
+
 cdef extern from "NormalizationLayerMaker.h":
-    cdef cppclass NormalizationLayerMaker:
+    cdef cppclass NormalizationLayerMaker(LayerMaker2):
         NormalizationLayerMaker *translate( float translate )
         NormalizationLayerMaker *scale( float scale )
         @staticmethod
         NormalizationLayerMaker *instance()
+
+cdef extern from "FullyConnectedMaker.h":
+    cdef cppclass FullyConnectedMaker(LayerMaker2):
+        FullyConnectedMaker *numPlanes( float numPlanes )
+        FullyConnectedMaker *imageSize( float imageSize )
+        FullyConnectedMaker *biased()
+        FullyConnectedMaker *biased(int _biased)
+        FullyConnectedMaker *linear()
+        FullyConnectedMaker *tanh()
+        FullyConnectedMaker *sigmoid()
+        FullyConnectedMaker *relu()
+        @staticmethod
+        FullyConnectedMaker *instance()
+
+
 
