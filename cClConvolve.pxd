@@ -19,6 +19,7 @@ cdef extern from "NeuralNet.h":
         void backPropFromLabels( float learningRate, const int *labels)
         void backProp( float learningRate, const float *expectedResults)
         int calcNumRight( const int *labels )
+        void addLayer( NormalizationLayerMaker *maker )
 
 cdef extern from "NetdefToNet.h":
     cdef cppclass NetdefToNet:
@@ -44,4 +45,11 @@ cdef extern from "GenericLoader.h":
         void getDimensions( string trainFilepath, int *p_numExamples, int *p_numPlanes, int *p_imageSize )
         @staticmethod
         void load( string trainFilepath, unsigned char *images, int *labels, int startN, int numExamples )
+
+cdef extern from "NormalizationLayerMaker.h":
+    cdef cppclass NormalizationLayerMaker:
+        NormalizationLayerMaker *translate( float translate )
+        NormalizationLayerMaker *scale( float scale )
+        @staticmethod
+        NormalizationLayerMaker *instance()
 

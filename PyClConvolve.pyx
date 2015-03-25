@@ -33,6 +33,8 @@ cdef class NeuralNet:
         return self.thisptr.backProp( learningRate, &expectedResults[0] )
     def calcNumRight( self, int[:] labels ):
         return self.thisptr.calcNumRight( &labels[0] )
+    def addLayer( self, NormalizationLayerMaker normalizationLayerMaker ):
+        self.thisptr.addLayer( normalizationLayerMaker.thisptr )
 
 cdef class NetdefToNet:
     @staticmethod
@@ -91,4 +93,18 @@ cdef class GenericLoader:
         print(total)
         for i in range(total):
             images[i] = ucImagesMv[i]
+
+cdef class NormalizationLayerMaker:
+    cdef cClConvolve.NormalizationLayerMaker *thisptr
+    def __cinit__( self ):
+        self.thisptr = new cClConvolve.NormalizationLayerMaker()
+    def translate( self, float _translate ):
+        self.thisptr.translate( _translate )
+        return self
+    def scale( self, float _scale ):
+        self.thisptr.scale( _scale )
+        return self
+    @staticmethod
+    def instance():
+        return NormalizationLayerMaker()
 

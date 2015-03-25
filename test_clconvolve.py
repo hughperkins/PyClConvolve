@@ -5,6 +5,7 @@ import array
 import PyClConvolve
 
 net = PyClConvolve.NeuralNet(1,28)
+net.addLayer( PyClConvolve.NormalizationLayerMaker().translate(-0.5).scale(1/255.0) )
 PyClConvolve.NetdefToNet.createNetFromNetdef( net, "rt2-8c5-mp2-16c5-mp3-150n-10n" ) 
 print( net.asString() )
  
@@ -17,8 +18,8 @@ images = array.array( 'f', [0] * (N*planes*size*size) )
 labels = array.array('i',[0] * N )
 PyClConvolve.GenericLoader.load(mnistFilePath, images, labels, 0, N )
 
-for i in range(N * planes * size * size):
-    images[i] = images[i] / 255.0 - 0.5
+#for i in range(N * planes * size * size):
+#    images[i] = images[i] / 255.0 - 0.5
 
 net.setBatchSize(128)
 for i in range(12): 

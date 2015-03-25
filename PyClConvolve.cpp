@@ -268,6 +268,7 @@ class __Pyx_FakeReference {
 #include "NetdefToNet.h"
 #include "NetLearner.h"
 #include "GenericLoader.h"
+#include "NormalizationLayerMaker.h"
 #include "stdlib.h"
 #include "pystate.h"
 #ifdef _OPENMP
@@ -560,12 +561,13 @@ struct __pyx_obj_12PyClConvolve_NeuralNet;
 struct __pyx_obj_12PyClConvolve_NetdefToNet;
 struct __pyx_obj_12PyClConvolve_NetLearner;
 struct __pyx_obj_12PyClConvolve_GenericLoader;
+struct __pyx_obj_12PyClConvolve_NormalizationLayerMaker;
 struct __pyx_array_obj;
 struct __pyx_MemviewEnum_obj;
 struct __pyx_memoryview_obj;
 struct __pyx_memoryviewslice_obj;
 
-/* "PyClConvolve.pyx":6
+/* "PyClConvolve.pyx":12
  * cimport cClConvolve
  * 
  * cdef class NeuralNet:             # <<<<<<<<<<<<<<
@@ -578,8 +580,8 @@ struct __pyx_obj_12PyClConvolve_NeuralNet {
 };
 
 
-/* "PyClConvolve.pyx":31
- *         return self.thisptr.calcNumRight( &labels[0] )
+/* "PyClConvolve.pyx":39
+ *         self.thisptr.addLayer( normalizationLayerMaker.thisptr )
  * 
  * cdef class NetdefToNet:             # <<<<<<<<<<<<<<
  *     @staticmethod
@@ -590,7 +592,7 @@ struct __pyx_obj_12PyClConvolve_NetdefToNet {
 };
 
 
-/* "PyClConvolve.pyx":36
+/* "PyClConvolve.pyx":44
  *         return cClConvolve.NetdefToNet.createNetFromNetdef( neuralnet.thisptr, netdef )
  * 
  * cdef class NetLearner:             # <<<<<<<<<<<<<<
@@ -603,7 +605,7 @@ struct __pyx_obj_12PyClConvolve_NetLearner {
 };
 
 
-/* "PyClConvolve.pyx":53
+/* "PyClConvolve.pyx":61
  *         self.thisptr.learn( learningRate )
  * 
  * cdef class GenericLoader:             # <<<<<<<<<<<<<<
@@ -612,6 +614,19 @@ struct __pyx_obj_12PyClConvolve_NetLearner {
  */
 struct __pyx_obj_12PyClConvolve_GenericLoader {
   PyObject_HEAD
+};
+
+
+/* "PyClConvolve.pyx":97
+ *             images[i] = ucImagesMv[i]
+ * 
+ * cdef class NormalizationLayerMaker:             # <<<<<<<<<<<<<<
+ *     cdef cClConvolve.NormalizationLayerMaker *thisptr
+ *     def __cinit__( self ):
+ */
+struct __pyx_obj_12PyClConvolve_NormalizationLayerMaker {
+  PyObject_HEAD
+  NormalizationLayerMaker *thisptr;
 };
 
 
@@ -871,6 +886,8 @@ static int __Pyx_IternextUnpackEndCheck(PyObject *retval, Py_ssize_t expected);
 static CYTHON_INLINE PyObject *__Pyx_GetModuleGlobalName(PyObject *name);
 
 static CYTHON_INLINE int __Pyx_TypeTest(PyObject *obj, PyTypeObject *type);
+
+static CYTHON_INLINE int __Pyx_CheckKeywordStrings(PyObject *kwdict, const char* function_name, int kw_allowed);
 
 static CYTHON_INLINE void __Pyx_ErrRestore(PyObject *type, PyObject *value, PyObject *tb);
 static CYTHON_INLINE void __Pyx_ErrFetch(PyObject **type, PyObject **value, PyObject **tb);
@@ -1189,6 +1206,45 @@ static PyObject* __pyx_print_kwargs = 0;
 
 static int __Pyx_PrintOne(PyObject* stream, PyObject *o);
 
+#ifndef __Pyx_CppExn2PyErr
+#include <new>
+#include <typeinfo>
+#include <stdexcept>
+#include <ios>
+static void __Pyx_CppExn2PyErr() {
+  try {
+    if (PyErr_Occurred())
+      ; // let the latest Python exn pass through and ignore the current one
+    else
+      throw;
+  } catch (const std::bad_alloc& exn) {
+    PyErr_SetString(PyExc_MemoryError, exn.what());
+  } catch (const std::bad_cast& exn) {
+    PyErr_SetString(PyExc_TypeError, exn.what());
+  } catch (const std::domain_error& exn) {
+    PyErr_SetString(PyExc_ValueError, exn.what());
+  } catch (const std::invalid_argument& exn) {
+    PyErr_SetString(PyExc_ValueError, exn.what());
+  } catch (const std::ios_base::failure& exn) {
+    PyErr_SetString(PyExc_IOError, exn.what());
+  } catch (const std::out_of_range& exn) {
+    PyErr_SetString(PyExc_IndexError, exn.what());
+  } catch (const std::overflow_error& exn) {
+    PyErr_SetString(PyExc_OverflowError, exn.what());
+  } catch (const std::range_error& exn) {
+    PyErr_SetString(PyExc_ArithmeticError, exn.what());
+  } catch (const std::underflow_error& exn) {
+    PyErr_SetString(PyExc_ArithmeticError, exn.what());
+  } catch (const std::exception& exn) {
+    PyErr_SetString(PyExc_RuntimeError, exn.what());
+  }
+  catch (...)
+  {
+    PyErr_SetString(PyExc_RuntimeError, "Unknown exception");
+  }
+}
+#endif
+
 static int __pyx_memviewslice_is_contig(const __Pyx_memviewslice *mvs,
                                         char order, int ndim);
 
@@ -1340,6 +1396,7 @@ static PyTypeObject *__pyx_ptype_12PyClConvolve_NeuralNet = 0;
 static PyTypeObject *__pyx_ptype_12PyClConvolve_NetdefToNet = 0;
 static PyTypeObject *__pyx_ptype_12PyClConvolve_NetLearner = 0;
 static PyTypeObject *__pyx_ptype_12PyClConvolve_GenericLoader = 0;
+static PyTypeObject *__pyx_ptype_12PyClConvolve_NormalizationLayerMaker = 0;
 static PyTypeObject *__pyx_array_type = 0;
 static PyTypeObject *__pyx_MemviewEnum_type = 0;
 static PyTypeObject *__pyx_memoryview_type = 0;
@@ -1410,6 +1467,7 @@ static PyObject *__pyx_pf_12PyClConvolve_9NeuralNet_6propagate(struct __pyx_obj_
 static PyObject *__pyx_pf_12PyClConvolve_9NeuralNet_8backPropFromLabels(struct __pyx_obj_12PyClConvolve_NeuralNet *__pyx_v_self, float __pyx_v_learningRate, __Pyx_memviewslice __pyx_v_labels); /* proto */
 static PyObject *__pyx_pf_12PyClConvolve_9NeuralNet_10backProp(struct __pyx_obj_12PyClConvolve_NeuralNet *__pyx_v_self, float __pyx_v_learningRate, __Pyx_memviewslice __pyx_v_expectedResults); /* proto */
 static PyObject *__pyx_pf_12PyClConvolve_9NeuralNet_12calcNumRight(struct __pyx_obj_12PyClConvolve_NeuralNet *__pyx_v_self, __Pyx_memviewslice __pyx_v_labels); /* proto */
+static PyObject *__pyx_pf_12PyClConvolve_9NeuralNet_14addLayer(struct __pyx_obj_12PyClConvolve_NeuralNet *__pyx_v_self, struct __pyx_obj_12PyClConvolve_NormalizationLayerMaker *__pyx_v_normalizationLayerMaker); /* proto */
 static PyObject *__pyx_pf_12PyClConvolve_11NetdefToNet_createNetFromNetdef(struct __pyx_obj_12PyClConvolve_NeuralNet *__pyx_v_neuralnet, PyObject *__pyx_v_netdef); /* proto */
 static int __pyx_pf_12PyClConvolve_10NetLearner___cinit__(struct __pyx_obj_12PyClConvolve_NetLearner *__pyx_v_self, struct __pyx_obj_12PyClConvolve_NeuralNet *__pyx_v_neuralnet); /* proto */
 static PyObject *__pyx_pf_12PyClConvolve_10NetLearner_2setTrainingData(struct __pyx_obj_12PyClConvolve_NetLearner *__pyx_v_self, PyObject *__pyx_v_Ntrain, __Pyx_memviewslice __pyx_v_trainData, __Pyx_memviewslice __pyx_v_trainLabels); /* proto */
@@ -1421,6 +1479,10 @@ static PyObject *__pyx_pf_12PyClConvolve_10NetLearner_12learn(struct __pyx_obj_1
 static PyObject *__pyx_pf_12PyClConvolve_13GenericLoader_getDimensions(PyObject *__pyx_v_trainFilePath); /* proto */
 static PyObject *__pyx_pf_12PyClConvolve_13GenericLoader_2loaduc(PyObject *__pyx_v_trainFilepath, __Pyx_memviewslice __pyx_v_images, __Pyx_memviewslice __pyx_v_labels, PyObject *__pyx_v_startN, PyObject *__pyx_v_numExamples); /* proto */
 static PyObject *__pyx_pf_12PyClConvolve_13GenericLoader_4load(PyObject *__pyx_v_trainFilepath, __Pyx_memviewslice __pyx_v_images, __Pyx_memviewslice __pyx_v_labels, PyObject *__pyx_v_startN, PyObject *__pyx_v_numExamples); /* proto */
+static int __pyx_pf_12PyClConvolve_23NormalizationLayerMaker___cinit__(struct __pyx_obj_12PyClConvolve_NormalizationLayerMaker *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_12PyClConvolve_23NormalizationLayerMaker_2translate(struct __pyx_obj_12PyClConvolve_NormalizationLayerMaker *__pyx_v_self, float __pyx_v__translate); /* proto */
+static PyObject *__pyx_pf_12PyClConvolve_23NormalizationLayerMaker_4scale(struct __pyx_obj_12PyClConvolve_NormalizationLayerMaker *__pyx_v_self, float __pyx_v__scale); /* proto */
+static PyObject *__pyx_pf_12PyClConvolve_23NormalizationLayerMaker_6instance(); /* proto */
 static int __pyx_pf_7cpython_5array_5array___getbuffer__(arrayobject *__pyx_v_self, Py_buffer *__pyx_v_info, CYTHON_UNUSED int __pyx_v_flags); /* proto */
 static void __pyx_pf_7cpython_5array_5array_2__releasebuffer__(CYTHON_UNUSED arrayobject *__pyx_v_self, Py_buffer *__pyx_v_info); /* proto */
 static int __pyx_array___pyx_pf_15View_dot_MemoryView_5array___cinit__(struct __pyx_array_obj *__pyx_v_self, PyObject *__pyx_v_shape, Py_ssize_t __pyx_v_itemsize, PyObject *__pyx_v_format, PyObject *__pyx_v_mode, int __pyx_v_allocate_buffer); /* proto */
@@ -1459,6 +1521,7 @@ static PyObject *__pyx_tp_new_12PyClConvolve_NeuralNet(PyTypeObject *t, PyObject
 static PyObject *__pyx_tp_new_12PyClConvolve_NetdefToNet(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 static PyObject *__pyx_tp_new_12PyClConvolve_NetLearner(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 static PyObject *__pyx_tp_new_12PyClConvolve_GenericLoader(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
+static PyObject *__pyx_tp_new_12PyClConvolve_NormalizationLayerMaker(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 static PyObject *__pyx_tp_new_array(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 static PyObject *__pyx_tp_new_Enum(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 static PyObject *__pyx_tp_new_memoryview(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
@@ -1508,6 +1571,7 @@ static char __pyx_k_unpack[] = "unpack";
 static char __pyx_k_fortran[] = "fortran";
 static char __pyx_k_memview[] = "memview";
 static char __pyx_k_Ellipsis[] = "Ellipsis";
+static char __pyx_k_instance[] = "instance";
 static char __pyx_k_itemsize[] = "itemsize";
 static char __pyx_k_testData[] = "testData";
 static char __pyx_k_ucImages[] = "ucImages";
@@ -1609,6 +1673,7 @@ static PyObject *__pyx_n_s_i;
 static PyObject *__pyx_n_s_id;
 static PyObject *__pyx_n_s_images;
 static PyObject *__pyx_n_s_import;
+static PyObject *__pyx_n_s_instance;
 static PyObject *__pyx_n_s_itemsize;
 static PyObject *__pyx_kp_s_itemsize_0_for_cython_array;
 static PyObject *__pyx_n_s_labels;
@@ -1674,17 +1739,18 @@ static PyObject *__pyx_tuple__13;
 static PyObject *__pyx_tuple__15;
 static PyObject *__pyx_tuple__17;
 static PyObject *__pyx_tuple__19;
-static PyObject *__pyx_tuple__21;
 static PyObject *__pyx_tuple__22;
 static PyObject *__pyx_tuple__23;
 static PyObject *__pyx_tuple__24;
 static PyObject *__pyx_tuple__25;
+static PyObject *__pyx_tuple__26;
 static PyObject *__pyx_codeobj__14;
 static PyObject *__pyx_codeobj__16;
 static PyObject *__pyx_codeobj__18;
 static PyObject *__pyx_codeobj__20;
+static PyObject *__pyx_codeobj__21;
 
-/* "PyClConvolve.pyx":9
+/* "PyClConvolve.pyx":15
  *     cdef cClConvolve.NeuralNet *thisptr
  * 
  *     def __cinit__(self, planes, size):             # <<<<<<<<<<<<<<
@@ -1723,11 +1789,11 @@ static int __pyx_pw_12PyClConvolve_9NeuralNet_1__cinit__(PyObject *__pyx_v_self,
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_size)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 2, 2, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 9; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 2, 2, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 15; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__cinit__") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 9; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__cinit__") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 15; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -1740,7 +1806,7 @@ static int __pyx_pw_12PyClConvolve_9NeuralNet_1__cinit__(PyObject *__pyx_v_self,
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 9; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 15; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("PyClConvolve.NeuralNet.__cinit__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -1763,18 +1829,18 @@ static int __pyx_pf_12PyClConvolve_9NeuralNet___cinit__(struct __pyx_obj_12PyClC
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__cinit__", 0);
 
-  /* "PyClConvolve.pyx":10
+  /* "PyClConvolve.pyx":16
  * 
  *     def __cinit__(self, planes, size):
  *         self.thisptr = new cClConvolve.NeuralNet(planes, size)             # <<<<<<<<<<<<<<
  * 
  *     def asString(self):
  */
-  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_planes); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 10; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_t_2 = __Pyx_PyInt_As_int(__pyx_v_size); if (unlikely((__pyx_t_2 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 10; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_planes); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 16; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyInt_As_int(__pyx_v_size); if (unlikely((__pyx_t_2 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 16; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_self->thisptr = new NeuralNet(__pyx_t_1, __pyx_t_2);
 
-  /* "PyClConvolve.pyx":9
+  /* "PyClConvolve.pyx":15
  *     cdef cClConvolve.NeuralNet *thisptr
  * 
  *     def __cinit__(self, planes, size):             # <<<<<<<<<<<<<<
@@ -1793,7 +1859,7 @@ static int __pyx_pf_12PyClConvolve_9NeuralNet___cinit__(struct __pyx_obj_12PyClC
   return __pyx_r;
 }
 
-/* "PyClConvolve.pyx":12
+/* "PyClConvolve.pyx":18
  *         self.thisptr = new cClConvolve.NeuralNet(planes, size)
  * 
  *     def asString(self):             # <<<<<<<<<<<<<<
@@ -1823,7 +1889,7 @@ static PyObject *__pyx_pf_12PyClConvolve_9NeuralNet_2asString(struct __pyx_obj_1
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("asString", 0);
 
-  /* "PyClConvolve.pyx":13
+  /* "PyClConvolve.pyx":19
  * 
  *     def asString(self):
  *         return self.thisptr.asString()             # <<<<<<<<<<<<<<
@@ -1831,13 +1897,13 @@ static PyObject *__pyx_pf_12PyClConvolve_9NeuralNet_2asString(struct __pyx_obj_1
  * #    def myprint(self):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_convert_PyBytes_string_to_py_std__in_string(__pyx_v_self->thisptr->asString()); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 13; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __pyx_convert_PyBytes_string_to_py_std__in_string(__pyx_v_self->thisptr->asString()); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 19; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "PyClConvolve.pyx":12
+  /* "PyClConvolve.pyx":18
  *         self.thisptr = new cClConvolve.NeuralNet(planes, size)
  * 
  *     def asString(self):             # <<<<<<<<<<<<<<
@@ -1856,7 +1922,7 @@ static PyObject *__pyx_pf_12PyClConvolve_9NeuralNet_2asString(struct __pyx_obj_1
   return __pyx_r;
 }
 
-/* "PyClConvolve.pyx":18
+/* "PyClConvolve.pyx":24
  * #        self.thisptr.print()
  * 
  *     def setBatchSize( self, int batchSize ):             # <<<<<<<<<<<<<<
@@ -1875,7 +1941,7 @@ static PyObject *__pyx_pw_12PyClConvolve_9NeuralNet_5setBatchSize(PyObject *__py
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("setBatchSize (wrapper)", 0);
   assert(__pyx_arg_batchSize); {
-    __pyx_v_batchSize = __Pyx_PyInt_As_int(__pyx_arg_batchSize); if (unlikely((__pyx_v_batchSize == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 18; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+    __pyx_v_batchSize = __Pyx_PyInt_As_int(__pyx_arg_batchSize); if (unlikely((__pyx_v_batchSize == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 24; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -1895,7 +1961,7 @@ static PyObject *__pyx_pf_12PyClConvolve_9NeuralNet_4setBatchSize(struct __pyx_o
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("setBatchSize", 0);
 
-  /* "PyClConvolve.pyx":19
+  /* "PyClConvolve.pyx":25
  * 
  *     def setBatchSize( self, int batchSize ):
  *         self.thisptr.setBatchSize( batchSize )             # <<<<<<<<<<<<<<
@@ -1904,7 +1970,7 @@ static PyObject *__pyx_pf_12PyClConvolve_9NeuralNet_4setBatchSize(struct __pyx_o
  */
   __pyx_v_self->thisptr->setBatchSize(__pyx_v_batchSize);
 
-  /* "PyClConvolve.pyx":18
+  /* "PyClConvolve.pyx":24
  * #        self.thisptr.print()
  * 
  *     def setBatchSize( self, int batchSize ):             # <<<<<<<<<<<<<<
@@ -1919,7 +1985,7 @@ static PyObject *__pyx_pf_12PyClConvolve_9NeuralNet_4setBatchSize(struct __pyx_o
   return __pyx_r;
 }
 
-/* "PyClConvolve.pyx":22
+/* "PyClConvolve.pyx":28
  *     #def propagate( self, const unsigned char[:] images):
  *     #    self.thisptr.propagate( &images[0] )
  *     def propagate( self, const float[:] images):             # <<<<<<<<<<<<<<
@@ -1938,7 +2004,7 @@ static PyObject *__pyx_pw_12PyClConvolve_9NeuralNet_7propagate(PyObject *__pyx_v
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("propagate (wrapper)", 0);
   assert(__pyx_arg_images); {
-    __pyx_v_images = __Pyx_PyObject_to_MemoryviewSlice_ds_float(__pyx_arg_images); if (unlikely(!__pyx_v_images.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 22; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+    __pyx_v_images = __Pyx_PyObject_to_MemoryviewSlice_ds_float(__pyx_arg_images); if (unlikely(!__pyx_v_images.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 28; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -1963,7 +2029,7 @@ static PyObject *__pyx_pf_12PyClConvolve_9NeuralNet_6propagate(struct __pyx_obj_
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("propagate", 0);
 
-  /* "PyClConvolve.pyx":23
+  /* "PyClConvolve.pyx":29
  *     #    self.thisptr.propagate( &images[0] )
  *     def propagate( self, const float[:] images):
  *         self.thisptr.propagate( &images[0] )             # <<<<<<<<<<<<<<
@@ -1978,11 +2044,11 @@ static PyObject *__pyx_pf_12PyClConvolve_9NeuralNet_6propagate(struct __pyx_obj_
   } else if (unlikely(__pyx_t_1 >= __pyx_v_images.shape[0])) __pyx_t_2 = 0;
   if (unlikely(__pyx_t_2 != -1)) {
     __Pyx_RaiseBufferIndexError(__pyx_t_2);
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 23; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 29; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_v_self->thisptr->propagate((&(*((float *) ( /* dim=0 */ (__pyx_v_images.data + __pyx_t_1 * __pyx_v_images.strides[0]) )))));
 
-  /* "PyClConvolve.pyx":22
+  /* "PyClConvolve.pyx":28
  *     #def propagate( self, const unsigned char[:] images):
  *     #    self.thisptr.propagate( &images[0] )
  *     def propagate( self, const float[:] images):             # <<<<<<<<<<<<<<
@@ -2003,7 +2069,7 @@ static PyObject *__pyx_pf_12PyClConvolve_9NeuralNet_6propagate(struct __pyx_obj_
   return __pyx_r;
 }
 
-/* "PyClConvolve.pyx":24
+/* "PyClConvolve.pyx":30
  *     def propagate( self, const float[:] images):
  *         self.thisptr.propagate( &images[0] )
  *     def backPropFromLabels( self, float learningRate, int[:] labels):             # <<<<<<<<<<<<<<
@@ -2042,11 +2108,11 @@ static PyObject *__pyx_pw_12PyClConvolve_9NeuralNet_9backPropFromLabels(PyObject
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_labels)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("backPropFromLabels", 1, 2, 2, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 24; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("backPropFromLabels", 1, 2, 2, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 30; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "backPropFromLabels") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 24; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "backPropFromLabels") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 30; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -2054,12 +2120,12 @@ static PyObject *__pyx_pw_12PyClConvolve_9NeuralNet_9backPropFromLabels(PyObject
       values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
       values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
     }
-    __pyx_v_learningRate = __pyx_PyFloat_AsFloat(values[0]); if (unlikely((__pyx_v_learningRate == (float)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 24; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
-    __pyx_v_labels = __Pyx_PyObject_to_MemoryviewSlice_ds_int(values[1]); if (unlikely(!__pyx_v_labels.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 24; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+    __pyx_v_learningRate = __pyx_PyFloat_AsFloat(values[0]); if (unlikely((__pyx_v_learningRate == (float)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 30; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+    __pyx_v_labels = __Pyx_PyObject_to_MemoryviewSlice_ds_int(values[1]); if (unlikely(!__pyx_v_labels.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 30; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("backPropFromLabels", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 24; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("backPropFromLabels", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 30; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("PyClConvolve.NeuralNet.backPropFromLabels", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -2083,7 +2149,7 @@ static PyObject *__pyx_pf_12PyClConvolve_9NeuralNet_8backPropFromLabels(struct _
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("backPropFromLabels", 0);
 
-  /* "PyClConvolve.pyx":25
+  /* "PyClConvolve.pyx":31
  *         self.thisptr.propagate( &images[0] )
  *     def backPropFromLabels( self, float learningRate, int[:] labels):
  *         return self.thisptr.backPropFromLabels( learningRate, &labels[0] )             # <<<<<<<<<<<<<<
@@ -2099,15 +2165,15 @@ static PyObject *__pyx_pf_12PyClConvolve_9NeuralNet_8backPropFromLabels(struct _
   } else if (unlikely(__pyx_t_1 >= __pyx_v_labels.shape[0])) __pyx_t_2 = 0;
   if (unlikely(__pyx_t_2 != -1)) {
     __Pyx_RaiseBufferIndexError(__pyx_t_2);
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 25; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 31; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
-  __pyx_t_3 = __Pyx_void_to_None(__pyx_v_self->thisptr->backPropFromLabels(__pyx_v_learningRate, (&(*((int *) ( /* dim=0 */ (__pyx_v_labels.data + __pyx_t_1 * __pyx_v_labels.strides[0]) )))))); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 25; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_void_to_None(__pyx_v_self->thisptr->backPropFromLabels(__pyx_v_learningRate, (&(*((int *) ( /* dim=0 */ (__pyx_v_labels.data + __pyx_t_1 * __pyx_v_labels.strides[0]) )))))); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 31; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_r = __pyx_t_3;
   __pyx_t_3 = 0;
   goto __pyx_L0;
 
-  /* "PyClConvolve.pyx":24
+  /* "PyClConvolve.pyx":30
  *     def propagate( self, const float[:] images):
  *         self.thisptr.propagate( &images[0] )
  *     def backPropFromLabels( self, float learningRate, int[:] labels):             # <<<<<<<<<<<<<<
@@ -2127,7 +2193,7 @@ static PyObject *__pyx_pf_12PyClConvolve_9NeuralNet_8backPropFromLabels(struct _
   return __pyx_r;
 }
 
-/* "PyClConvolve.pyx":26
+/* "PyClConvolve.pyx":32
  *     def backPropFromLabels( self, float learningRate, int[:] labels):
  *         return self.thisptr.backPropFromLabels( learningRate, &labels[0] )
  *     def backProp( self, float learningRate, float[:] expectedResults):             # <<<<<<<<<<<<<<
@@ -2166,11 +2232,11 @@ static PyObject *__pyx_pw_12PyClConvolve_9NeuralNet_11backProp(PyObject *__pyx_v
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_expectedResults)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("backProp", 1, 2, 2, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 26; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("backProp", 1, 2, 2, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 32; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "backProp") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 26; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "backProp") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 32; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -2178,12 +2244,12 @@ static PyObject *__pyx_pw_12PyClConvolve_9NeuralNet_11backProp(PyObject *__pyx_v
       values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
       values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
     }
-    __pyx_v_learningRate = __pyx_PyFloat_AsFloat(values[0]); if (unlikely((__pyx_v_learningRate == (float)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 26; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
-    __pyx_v_expectedResults = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[1]); if (unlikely(!__pyx_v_expectedResults.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 26; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+    __pyx_v_learningRate = __pyx_PyFloat_AsFloat(values[0]); if (unlikely((__pyx_v_learningRate == (float)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 32; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+    __pyx_v_expectedResults = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[1]); if (unlikely(!__pyx_v_expectedResults.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 32; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("backProp", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 26; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("backProp", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 32; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("PyClConvolve.NeuralNet.backProp", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -2207,7 +2273,7 @@ static PyObject *__pyx_pf_12PyClConvolve_9NeuralNet_10backProp(struct __pyx_obj_
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("backProp", 0);
 
-  /* "PyClConvolve.pyx":27
+  /* "PyClConvolve.pyx":33
  *         return self.thisptr.backPropFromLabels( learningRate, &labels[0] )
  *     def backProp( self, float learningRate, float[:] expectedResults):
  *         return self.thisptr.backProp( learningRate, &expectedResults[0] )             # <<<<<<<<<<<<<<
@@ -2223,15 +2289,15 @@ static PyObject *__pyx_pf_12PyClConvolve_9NeuralNet_10backProp(struct __pyx_obj_
   } else if (unlikely(__pyx_t_1 >= __pyx_v_expectedResults.shape[0])) __pyx_t_2 = 0;
   if (unlikely(__pyx_t_2 != -1)) {
     __Pyx_RaiseBufferIndexError(__pyx_t_2);
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 27; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 33; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
-  __pyx_t_3 = __Pyx_void_to_None(__pyx_v_self->thisptr->backProp(__pyx_v_learningRate, (&(*((float *) ( /* dim=0 */ (__pyx_v_expectedResults.data + __pyx_t_1 * __pyx_v_expectedResults.strides[0]) )))))); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 27; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_void_to_None(__pyx_v_self->thisptr->backProp(__pyx_v_learningRate, (&(*((float *) ( /* dim=0 */ (__pyx_v_expectedResults.data + __pyx_t_1 * __pyx_v_expectedResults.strides[0]) )))))); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 33; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_r = __pyx_t_3;
   __pyx_t_3 = 0;
   goto __pyx_L0;
 
-  /* "PyClConvolve.pyx":26
+  /* "PyClConvolve.pyx":32
  *     def backPropFromLabels( self, float learningRate, int[:] labels):
  *         return self.thisptr.backPropFromLabels( learningRate, &labels[0] )
  *     def backProp( self, float learningRate, float[:] expectedResults):             # <<<<<<<<<<<<<<
@@ -2251,12 +2317,12 @@ static PyObject *__pyx_pf_12PyClConvolve_9NeuralNet_10backProp(struct __pyx_obj_
   return __pyx_r;
 }
 
-/* "PyClConvolve.pyx":28
+/* "PyClConvolve.pyx":34
  *     def backProp( self, float learningRate, float[:] expectedResults):
  *         return self.thisptr.backProp( learningRate, &expectedResults[0] )
  *     def calcNumRight( self, int[:] labels ):             # <<<<<<<<<<<<<<
  *         return self.thisptr.calcNumRight( &labels[0] )
- * 
+ *     def addLayer( self, NormalizationLayerMaker normalizationLayerMaker ):
  */
 
 /* Python wrapper */
@@ -2270,7 +2336,7 @@ static PyObject *__pyx_pw_12PyClConvolve_9NeuralNet_13calcNumRight(PyObject *__p
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("calcNumRight (wrapper)", 0);
   assert(__pyx_arg_labels); {
-    __pyx_v_labels = __Pyx_PyObject_to_MemoryviewSlice_ds_int(__pyx_arg_labels); if (unlikely(!__pyx_v_labels.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 28; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+    __pyx_v_labels = __Pyx_PyObject_to_MemoryviewSlice_ds_int(__pyx_arg_labels); if (unlikely(!__pyx_v_labels.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 34; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -2296,12 +2362,12 @@ static PyObject *__pyx_pf_12PyClConvolve_9NeuralNet_12calcNumRight(struct __pyx_
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("calcNumRight", 0);
 
-  /* "PyClConvolve.pyx":29
+  /* "PyClConvolve.pyx":35
  *         return self.thisptr.backProp( learningRate, &expectedResults[0] )
  *     def calcNumRight( self, int[:] labels ):
  *         return self.thisptr.calcNumRight( &labels[0] )             # <<<<<<<<<<<<<<
- * 
- * cdef class NetdefToNet:
+ *     def addLayer( self, NormalizationLayerMaker normalizationLayerMaker ):
+ *         self.thisptr.addLayer( normalizationLayerMaker.thisptr )
  */
   __Pyx_XDECREF(__pyx_r);
   __pyx_t_1 = 0;
@@ -2312,20 +2378,20 @@ static PyObject *__pyx_pf_12PyClConvolve_9NeuralNet_12calcNumRight(struct __pyx_
   } else if (unlikely(__pyx_t_1 >= __pyx_v_labels.shape[0])) __pyx_t_2 = 0;
   if (unlikely(__pyx_t_2 != -1)) {
     __Pyx_RaiseBufferIndexError(__pyx_t_2);
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 29; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 35; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
-  __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_self->thisptr->calcNumRight((&(*((int *) ( /* dim=0 */ (__pyx_v_labels.data + __pyx_t_1 * __pyx_v_labels.strides[0]) )))))); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 29; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_self->thisptr->calcNumRight((&(*((int *) ( /* dim=0 */ (__pyx_v_labels.data + __pyx_t_1 * __pyx_v_labels.strides[0]) )))))); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 35; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_r = __pyx_t_3;
   __pyx_t_3 = 0;
   goto __pyx_L0;
 
-  /* "PyClConvolve.pyx":28
+  /* "PyClConvolve.pyx":34
  *     def backProp( self, float learningRate, float[:] expectedResults):
  *         return self.thisptr.backProp( learningRate, &expectedResults[0] )
  *     def calcNumRight( self, int[:] labels ):             # <<<<<<<<<<<<<<
  *         return self.thisptr.calcNumRight( &labels[0] )
- * 
+ *     def addLayer( self, NormalizationLayerMaker normalizationLayerMaker ):
  */
 
   /* function exit code */
@@ -2340,7 +2406,65 @@ static PyObject *__pyx_pf_12PyClConvolve_9NeuralNet_12calcNumRight(struct __pyx_
   return __pyx_r;
 }
 
-/* "PyClConvolve.pyx":33
+/* "PyClConvolve.pyx":36
+ *     def calcNumRight( self, int[:] labels ):
+ *         return self.thisptr.calcNumRight( &labels[0] )
+ *     def addLayer( self, NormalizationLayerMaker normalizationLayerMaker ):             # <<<<<<<<<<<<<<
+ *         self.thisptr.addLayer( normalizationLayerMaker.thisptr )
+ * 
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_12PyClConvolve_9NeuralNet_15addLayer(PyObject *__pyx_v_self, PyObject *__pyx_v_normalizationLayerMaker); /*proto*/
+static PyObject *__pyx_pw_12PyClConvolve_9NeuralNet_15addLayer(PyObject *__pyx_v_self, PyObject *__pyx_v_normalizationLayerMaker) {
+  CYTHON_UNUSED int __pyx_lineno = 0;
+  CYTHON_UNUSED const char *__pyx_filename = NULL;
+  CYTHON_UNUSED int __pyx_clineno = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("addLayer (wrapper)", 0);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_normalizationLayerMaker), __pyx_ptype_12PyClConvolve_NormalizationLayerMaker, 1, "normalizationLayerMaker", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 36; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_r = __pyx_pf_12PyClConvolve_9NeuralNet_14addLayer(((struct __pyx_obj_12PyClConvolve_NeuralNet *)__pyx_v_self), ((struct __pyx_obj_12PyClConvolve_NormalizationLayerMaker *)__pyx_v_normalizationLayerMaker));
+
+  /* function exit code */
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_12PyClConvolve_9NeuralNet_14addLayer(struct __pyx_obj_12PyClConvolve_NeuralNet *__pyx_v_self, struct __pyx_obj_12PyClConvolve_NormalizationLayerMaker *__pyx_v_normalizationLayerMaker) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("addLayer", 0);
+
+  /* "PyClConvolve.pyx":37
+ *         return self.thisptr.calcNumRight( &labels[0] )
+ *     def addLayer( self, NormalizationLayerMaker normalizationLayerMaker ):
+ *         self.thisptr.addLayer( normalizationLayerMaker.thisptr )             # <<<<<<<<<<<<<<
+ * 
+ * cdef class NetdefToNet:
+ */
+  __pyx_v_self->thisptr->addLayer(__pyx_v_normalizationLayerMaker->thisptr);
+
+  /* "PyClConvolve.pyx":36
+ *     def calcNumRight( self, int[:] labels ):
+ *         return self.thisptr.calcNumRight( &labels[0] )
+ *     def addLayer( self, NormalizationLayerMaker normalizationLayerMaker ):             # <<<<<<<<<<<<<<
+ *         self.thisptr.addLayer( normalizationLayerMaker.thisptr )
+ * 
+ */
+
+  /* function exit code */
+  __pyx_r = Py_None; __Pyx_INCREF(Py_None);
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "PyClConvolve.pyx":41
  * cdef class NetdefToNet:
  *     @staticmethod
  *     def createNetFromNetdef( NeuralNet neuralnet, netdef ):             # <<<<<<<<<<<<<<
@@ -2380,11 +2504,11 @@ static PyObject *__pyx_pw_12PyClConvolve_11NetdefToNet_1createNetFromNetdef(CYTH
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_netdef)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("createNetFromNetdef", 1, 2, 2, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 33; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("createNetFromNetdef", 1, 2, 2, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 41; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "createNetFromNetdef") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 33; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "createNetFromNetdef") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 41; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -2397,13 +2521,13 @@ static PyObject *__pyx_pw_12PyClConvolve_11NetdefToNet_1createNetFromNetdef(CYTH
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("createNetFromNetdef", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 33; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("createNetFromNetdef", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 41; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("PyClConvolve.NetdefToNet.createNetFromNetdef", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_neuralnet), __pyx_ptype_12PyClConvolve_NeuralNet, 1, "neuralnet", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 33; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_neuralnet), __pyx_ptype_12PyClConvolve_NeuralNet, 1, "neuralnet", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 41; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_r = __pyx_pf_12PyClConvolve_11NetdefToNet_createNetFromNetdef(__pyx_v_neuralnet, __pyx_v_netdef);
 
   /* function exit code */
@@ -2425,7 +2549,7 @@ static PyObject *__pyx_pf_12PyClConvolve_11NetdefToNet_createNetFromNetdef(struc
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("createNetFromNetdef", 0);
 
-  /* "PyClConvolve.pyx":34
+  /* "PyClConvolve.pyx":42
  *     @staticmethod
  *     def createNetFromNetdef( NeuralNet neuralnet, netdef ):
  *         return cClConvolve.NetdefToNet.createNetFromNetdef( neuralnet.thisptr, netdef )             # <<<<<<<<<<<<<<
@@ -2433,14 +2557,14 @@ static PyObject *__pyx_pf_12PyClConvolve_11NetdefToNet_createNetFromNetdef(struc
  * cdef class NetLearner:
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_convert_string_from_py_std__in_string(__pyx_v_netdef); if (unlikely(PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 34; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_t_2 = __Pyx_PyBool_FromLong(NetdefToNet::createNetFromNetdef(__pyx_v_neuralnet->thisptr, __pyx_t_1)); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 34; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __pyx_convert_string_from_py_std__in_string(__pyx_v_netdef); if (unlikely(PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 42; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyBool_FromLong(NetdefToNet::createNetFromNetdef(__pyx_v_neuralnet->thisptr, __pyx_t_1)); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 42; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_r = __pyx_t_2;
   __pyx_t_2 = 0;
   goto __pyx_L0;
 
-  /* "PyClConvolve.pyx":33
+  /* "PyClConvolve.pyx":41
  * cdef class NetdefToNet:
  *     @staticmethod
  *     def createNetFromNetdef( NeuralNet neuralnet, netdef ):             # <<<<<<<<<<<<<<
@@ -2459,7 +2583,7 @@ static PyObject *__pyx_pf_12PyClConvolve_11NetdefToNet_createNetFromNetdef(struc
   return __pyx_r;
 }
 
-/* "PyClConvolve.pyx":38
+/* "PyClConvolve.pyx":46
  * cdef class NetLearner:
  *     cdef cClConvolve.NetLearner[float] *thisptr
  *     def __cinit__( self, NeuralNet neuralnet ):             # <<<<<<<<<<<<<<
@@ -2495,7 +2619,7 @@ static int __pyx_pw_12PyClConvolve_10NetLearner_1__cinit__(PyObject *__pyx_v_sel
         else goto __pyx_L5_argtuple_error;
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__cinit__") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 38; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__cinit__") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 46; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 1) {
       goto __pyx_L5_argtuple_error;
@@ -2506,13 +2630,13 @@ static int __pyx_pw_12PyClConvolve_10NetLearner_1__cinit__(PyObject *__pyx_v_sel
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 1, 1, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 38; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 1, 1, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 46; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("PyClConvolve.NetLearner.__cinit__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return -1;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_neuralnet), __pyx_ptype_12PyClConvolve_NeuralNet, 1, "neuralnet", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 38; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_neuralnet), __pyx_ptype_12PyClConvolve_NeuralNet, 1, "neuralnet", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 46; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_r = __pyx_pf_12PyClConvolve_10NetLearner___cinit__(((struct __pyx_obj_12PyClConvolve_NetLearner *)__pyx_v_self), __pyx_v_neuralnet);
 
   /* function exit code */
@@ -2529,7 +2653,7 @@ static int __pyx_pf_12PyClConvolve_10NetLearner___cinit__(struct __pyx_obj_12PyC
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__cinit__", 0);
 
-  /* "PyClConvolve.pyx":39
+  /* "PyClConvolve.pyx":47
  *     cdef cClConvolve.NetLearner[float] *thisptr
  *     def __cinit__( self, NeuralNet neuralnet ):
  *         self.thisptr = new cClConvolve.NetLearner[float]( neuralnet.thisptr )             # <<<<<<<<<<<<<<
@@ -2538,7 +2662,7 @@ static int __pyx_pf_12PyClConvolve_10NetLearner___cinit__(struct __pyx_obj_12PyC
  */
   __pyx_v_self->thisptr = new NetLearner<float> (__pyx_v_neuralnet->thisptr);
 
-  /* "PyClConvolve.pyx":38
+  /* "PyClConvolve.pyx":46
  * cdef class NetLearner:
  *     cdef cClConvolve.NetLearner[float] *thisptr
  *     def __cinit__( self, NeuralNet neuralnet ):             # <<<<<<<<<<<<<<
@@ -2552,7 +2676,7 @@ static int __pyx_pf_12PyClConvolve_10NetLearner___cinit__(struct __pyx_obj_12PyC
   return __pyx_r;
 }
 
-/* "PyClConvolve.pyx":40
+/* "PyClConvolve.pyx":48
  *     def __cinit__( self, NeuralNet neuralnet ):
  *         self.thisptr = new cClConvolve.NetLearner[float]( neuralnet.thisptr )
  *     def setTrainingData( self, Ntrain, float[:] trainData, int[:] trainLabels ):             # <<<<<<<<<<<<<<
@@ -2593,16 +2717,16 @@ static PyObject *__pyx_pw_12PyClConvolve_10NetLearner_3setTrainingData(PyObject 
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_trainData)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("setTrainingData", 1, 3, 3, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 40; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("setTrainingData", 1, 3, 3, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 48; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
         case  2:
         if (likely((values[2] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_trainLabels)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("setTrainingData", 1, 3, 3, 2); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 40; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("setTrainingData", 1, 3, 3, 2); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 48; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "setTrainingData") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 40; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "setTrainingData") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 48; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 3) {
       goto __pyx_L5_argtuple_error;
@@ -2612,12 +2736,12 @@ static PyObject *__pyx_pw_12PyClConvolve_10NetLearner_3setTrainingData(PyObject 
       values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
     }
     __pyx_v_Ntrain = values[0];
-    __pyx_v_trainData = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[1]); if (unlikely(!__pyx_v_trainData.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 40; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
-    __pyx_v_trainLabels = __Pyx_PyObject_to_MemoryviewSlice_ds_int(values[2]); if (unlikely(!__pyx_v_trainLabels.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 40; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+    __pyx_v_trainData = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[1]); if (unlikely(!__pyx_v_trainData.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 48; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+    __pyx_v_trainLabels = __Pyx_PyObject_to_MemoryviewSlice_ds_int(values[2]); if (unlikely(!__pyx_v_trainLabels.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 48; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("setTrainingData", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 40; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("setTrainingData", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 48; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("PyClConvolve.NetLearner.setTrainingData", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -2642,14 +2766,14 @@ static PyObject *__pyx_pf_12PyClConvolve_10NetLearner_2setTrainingData(struct __
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("setTrainingData", 0);
 
-  /* "PyClConvolve.pyx":41
+  /* "PyClConvolve.pyx":49
  *         self.thisptr = new cClConvolve.NetLearner[float]( neuralnet.thisptr )
  *     def setTrainingData( self, Ntrain, float[:] trainData, int[:] trainLabels ):
  *         self.thisptr.setTrainingData( Ntrain, &trainData[0], &trainLabels[0] )             # <<<<<<<<<<<<<<
  *     def setTestingData( self, Ntest, float[:] testData, int[:] testLabels ):
  *         self.thisptr.setTestingData( Ntest, &testData[0], &testLabels[0] )
  */
-  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_Ntrain); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 41; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_Ntrain); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 49; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_t_2 = 0;
   __pyx_t_3 = -1;
   if (__pyx_t_2 < 0) {
@@ -2658,7 +2782,7 @@ static PyObject *__pyx_pf_12PyClConvolve_10NetLearner_2setTrainingData(struct __
   } else if (unlikely(__pyx_t_2 >= __pyx_v_trainData.shape[0])) __pyx_t_3 = 0;
   if (unlikely(__pyx_t_3 != -1)) {
     __Pyx_RaiseBufferIndexError(__pyx_t_3);
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 41; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 49; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_t_4 = 0;
   __pyx_t_3 = -1;
@@ -2668,11 +2792,11 @@ static PyObject *__pyx_pf_12PyClConvolve_10NetLearner_2setTrainingData(struct __
   } else if (unlikely(__pyx_t_4 >= __pyx_v_trainLabels.shape[0])) __pyx_t_3 = 0;
   if (unlikely(__pyx_t_3 != -1)) {
     __Pyx_RaiseBufferIndexError(__pyx_t_3);
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 41; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 49; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_v_self->thisptr->setTrainingData(__pyx_t_1, (&(*((float *) ( /* dim=0 */ (__pyx_v_trainData.data + __pyx_t_2 * __pyx_v_trainData.strides[0]) )))), (&(*((int *) ( /* dim=0 */ (__pyx_v_trainLabels.data + __pyx_t_4 * __pyx_v_trainLabels.strides[0]) )))));
 
-  /* "PyClConvolve.pyx":40
+  /* "PyClConvolve.pyx":48
  *     def __cinit__( self, NeuralNet neuralnet ):
  *         self.thisptr = new cClConvolve.NetLearner[float]( neuralnet.thisptr )
  *     def setTrainingData( self, Ntrain, float[:] trainData, int[:] trainLabels ):             # <<<<<<<<<<<<<<
@@ -2694,7 +2818,7 @@ static PyObject *__pyx_pf_12PyClConvolve_10NetLearner_2setTrainingData(struct __
   return __pyx_r;
 }
 
-/* "PyClConvolve.pyx":42
+/* "PyClConvolve.pyx":50
  *     def setTrainingData( self, Ntrain, float[:] trainData, int[:] trainLabels ):
  *         self.thisptr.setTrainingData( Ntrain, &trainData[0], &trainLabels[0] )
  *     def setTestingData( self, Ntest, float[:] testData, int[:] testLabels ):             # <<<<<<<<<<<<<<
@@ -2735,16 +2859,16 @@ static PyObject *__pyx_pw_12PyClConvolve_10NetLearner_5setTestingData(PyObject *
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_testData)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("setTestingData", 1, 3, 3, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 42; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("setTestingData", 1, 3, 3, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 50; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
         case  2:
         if (likely((values[2] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_testLabels)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("setTestingData", 1, 3, 3, 2); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 42; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("setTestingData", 1, 3, 3, 2); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 50; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "setTestingData") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 42; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "setTestingData") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 50; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 3) {
       goto __pyx_L5_argtuple_error;
@@ -2754,12 +2878,12 @@ static PyObject *__pyx_pw_12PyClConvolve_10NetLearner_5setTestingData(PyObject *
       values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
     }
     __pyx_v_Ntest = values[0];
-    __pyx_v_testData = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[1]); if (unlikely(!__pyx_v_testData.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 42; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
-    __pyx_v_testLabels = __Pyx_PyObject_to_MemoryviewSlice_ds_int(values[2]); if (unlikely(!__pyx_v_testLabels.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 42; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+    __pyx_v_testData = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[1]); if (unlikely(!__pyx_v_testData.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 50; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+    __pyx_v_testLabels = __Pyx_PyObject_to_MemoryviewSlice_ds_int(values[2]); if (unlikely(!__pyx_v_testLabels.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 50; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("setTestingData", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 42; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("setTestingData", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 50; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("PyClConvolve.NetLearner.setTestingData", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -2784,14 +2908,14 @@ static PyObject *__pyx_pf_12PyClConvolve_10NetLearner_4setTestingData(struct __p
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("setTestingData", 0);
 
-  /* "PyClConvolve.pyx":43
+  /* "PyClConvolve.pyx":51
  *         self.thisptr.setTrainingData( Ntrain, &trainData[0], &trainLabels[0] )
  *     def setTestingData( self, Ntest, float[:] testData, int[:] testLabels ):
  *         self.thisptr.setTestingData( Ntest, &testData[0], &testLabels[0] )             # <<<<<<<<<<<<<<
  *     def setSchedule( self, numEpochs ):
  *         self.thisptr.setSchedule( numEpochs )
  */
-  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_Ntest); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 43; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_Ntest); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 51; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_t_2 = 0;
   __pyx_t_3 = -1;
   if (__pyx_t_2 < 0) {
@@ -2800,7 +2924,7 @@ static PyObject *__pyx_pf_12PyClConvolve_10NetLearner_4setTestingData(struct __p
   } else if (unlikely(__pyx_t_2 >= __pyx_v_testData.shape[0])) __pyx_t_3 = 0;
   if (unlikely(__pyx_t_3 != -1)) {
     __Pyx_RaiseBufferIndexError(__pyx_t_3);
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 43; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 51; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_t_4 = 0;
   __pyx_t_3 = -1;
@@ -2810,11 +2934,11 @@ static PyObject *__pyx_pf_12PyClConvolve_10NetLearner_4setTestingData(struct __p
   } else if (unlikely(__pyx_t_4 >= __pyx_v_testLabels.shape[0])) __pyx_t_3 = 0;
   if (unlikely(__pyx_t_3 != -1)) {
     __Pyx_RaiseBufferIndexError(__pyx_t_3);
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 43; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 51; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_v_self->thisptr->setTestingData(__pyx_t_1, (&(*((float *) ( /* dim=0 */ (__pyx_v_testData.data + __pyx_t_2 * __pyx_v_testData.strides[0]) )))), (&(*((int *) ( /* dim=0 */ (__pyx_v_testLabels.data + __pyx_t_4 * __pyx_v_testLabels.strides[0]) )))));
 
-  /* "PyClConvolve.pyx":42
+  /* "PyClConvolve.pyx":50
  *     def setTrainingData( self, Ntrain, float[:] trainData, int[:] trainLabels ):
  *         self.thisptr.setTrainingData( Ntrain, &trainData[0], &trainLabels[0] )
  *     def setTestingData( self, Ntest, float[:] testData, int[:] testLabels ):             # <<<<<<<<<<<<<<
@@ -2836,7 +2960,7 @@ static PyObject *__pyx_pf_12PyClConvolve_10NetLearner_4setTestingData(struct __p
   return __pyx_r;
 }
 
-/* "PyClConvolve.pyx":44
+/* "PyClConvolve.pyx":52
  *     def setTestingData( self, Ntest, float[:] testData, int[:] testLabels ):
  *         self.thisptr.setTestingData( Ntest, &testData[0], &testLabels[0] )
  *     def setSchedule( self, numEpochs ):             # <<<<<<<<<<<<<<
@@ -2866,17 +2990,17 @@ static PyObject *__pyx_pf_12PyClConvolve_10NetLearner_6setSchedule(struct __pyx_
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("setSchedule", 0);
 
-  /* "PyClConvolve.pyx":45
+  /* "PyClConvolve.pyx":53
  *         self.thisptr.setTestingData( Ntest, &testData[0], &testLabels[0] )
  *     def setSchedule( self, numEpochs ):
  *         self.thisptr.setSchedule( numEpochs )             # <<<<<<<<<<<<<<
  *     def setDumpTimings( self, bint dumpTimings ):
  *         self.thisptr.setDumpTimings( dumpTimings )
  */
-  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_numEpochs); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 45; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_numEpochs); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 53; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_self->thisptr->setSchedule(__pyx_t_1);
 
-  /* "PyClConvolve.pyx":44
+  /* "PyClConvolve.pyx":52
  *     def setTestingData( self, Ntest, float[:] testData, int[:] testLabels ):
  *         self.thisptr.setTestingData( Ntest, &testData[0], &testLabels[0] )
  *     def setSchedule( self, numEpochs ):             # <<<<<<<<<<<<<<
@@ -2896,7 +3020,7 @@ static PyObject *__pyx_pf_12PyClConvolve_10NetLearner_6setSchedule(struct __pyx_
   return __pyx_r;
 }
 
-/* "PyClConvolve.pyx":46
+/* "PyClConvolve.pyx":54
  *     def setSchedule( self, numEpochs ):
  *         self.thisptr.setSchedule( numEpochs )
  *     def setDumpTimings( self, bint dumpTimings ):             # <<<<<<<<<<<<<<
@@ -2915,7 +3039,7 @@ static PyObject *__pyx_pw_12PyClConvolve_10NetLearner_9setDumpTimings(PyObject *
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("setDumpTimings (wrapper)", 0);
   assert(__pyx_arg_dumpTimings); {
-    __pyx_v_dumpTimings = __Pyx_PyObject_IsTrue(__pyx_arg_dumpTimings); if (unlikely((__pyx_v_dumpTimings == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 46; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+    __pyx_v_dumpTimings = __Pyx_PyObject_IsTrue(__pyx_arg_dumpTimings); if (unlikely((__pyx_v_dumpTimings == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 54; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -2935,7 +3059,7 @@ static PyObject *__pyx_pf_12PyClConvolve_10NetLearner_8setDumpTimings(struct __p
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("setDumpTimings", 0);
 
-  /* "PyClConvolve.pyx":47
+  /* "PyClConvolve.pyx":55
  *         self.thisptr.setSchedule( numEpochs )
  *     def setDumpTimings( self, bint dumpTimings ):
  *         self.thisptr.setDumpTimings( dumpTimings )             # <<<<<<<<<<<<<<
@@ -2944,7 +3068,7 @@ static PyObject *__pyx_pf_12PyClConvolve_10NetLearner_8setDumpTimings(struct __p
  */
   __pyx_v_self->thisptr->setDumpTimings(__pyx_v_dumpTimings);
 
-  /* "PyClConvolve.pyx":46
+  /* "PyClConvolve.pyx":54
  *     def setSchedule( self, numEpochs ):
  *         self.thisptr.setSchedule( numEpochs )
  *     def setDumpTimings( self, bint dumpTimings ):             # <<<<<<<<<<<<<<
@@ -2959,7 +3083,7 @@ static PyObject *__pyx_pf_12PyClConvolve_10NetLearner_8setDumpTimings(struct __p
   return __pyx_r;
 }
 
-/* "PyClConvolve.pyx":48
+/* "PyClConvolve.pyx":56
  *     def setDumpTimings( self, bint dumpTimings ):
  *         self.thisptr.setDumpTimings( dumpTimings )
  *     def setBatchSize( self, batchSize ):             # <<<<<<<<<<<<<<
@@ -2989,17 +3113,17 @@ static PyObject *__pyx_pf_12PyClConvolve_10NetLearner_10setBatchSize(struct __py
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("setBatchSize", 0);
 
-  /* "PyClConvolve.pyx":49
+  /* "PyClConvolve.pyx":57
  *         self.thisptr.setDumpTimings( dumpTimings )
  *     def setBatchSize( self, batchSize ):
  *         self.thisptr.setBatchSize( batchSize )             # <<<<<<<<<<<<<<
  *     def learn( self, learningRate ):
  *         self.thisptr.learn( learningRate )
  */
-  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_batchSize); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 49; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_batchSize); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 57; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_self->thisptr->setBatchSize(__pyx_t_1);
 
-  /* "PyClConvolve.pyx":48
+  /* "PyClConvolve.pyx":56
  *     def setDumpTimings( self, bint dumpTimings ):
  *         self.thisptr.setDumpTimings( dumpTimings )
  *     def setBatchSize( self, batchSize ):             # <<<<<<<<<<<<<<
@@ -3019,7 +3143,7 @@ static PyObject *__pyx_pf_12PyClConvolve_10NetLearner_10setBatchSize(struct __py
   return __pyx_r;
 }
 
-/* "PyClConvolve.pyx":50
+/* "PyClConvolve.pyx":58
  *     def setBatchSize( self, batchSize ):
  *         self.thisptr.setBatchSize( batchSize )
  *     def learn( self, learningRate ):             # <<<<<<<<<<<<<<
@@ -3049,17 +3173,17 @@ static PyObject *__pyx_pf_12PyClConvolve_10NetLearner_12learn(struct __pyx_obj_1
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("learn", 0);
 
-  /* "PyClConvolve.pyx":51
+  /* "PyClConvolve.pyx":59
  *         self.thisptr.setBatchSize( batchSize )
  *     def learn( self, learningRate ):
  *         self.thisptr.learn( learningRate )             # <<<<<<<<<<<<<<
  * 
  * cdef class GenericLoader:
  */
-  __pyx_t_1 = __pyx_PyFloat_AsFloat(__pyx_v_learningRate); if (unlikely((__pyx_t_1 == (float)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 51; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __pyx_PyFloat_AsFloat(__pyx_v_learningRate); if (unlikely((__pyx_t_1 == (float)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 59; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_self->thisptr->learn(__pyx_t_1);
 
-  /* "PyClConvolve.pyx":50
+  /* "PyClConvolve.pyx":58
  *     def setBatchSize( self, batchSize ):
  *         self.thisptr.setBatchSize( batchSize )
  *     def learn( self, learningRate ):             # <<<<<<<<<<<<<<
@@ -3079,7 +3203,7 @@ static PyObject *__pyx_pf_12PyClConvolve_10NetLearner_12learn(struct __pyx_obj_1
   return __pyx_r;
 }
 
-/* "PyClConvolve.pyx":55
+/* "PyClConvolve.pyx":63
  * cdef class GenericLoader:
  *     @staticmethod
  *     def getDimensions( trainFilePath ):             # <<<<<<<<<<<<<<
@@ -3116,7 +3240,7 @@ static PyObject *__pyx_pw_12PyClConvolve_13GenericLoader_1getDimensions(CYTHON_U
         else goto __pyx_L5_argtuple_error;
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "getDimensions") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 55; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "getDimensions") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 63; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 1) {
       goto __pyx_L5_argtuple_error;
@@ -3127,7 +3251,7 @@ static PyObject *__pyx_pw_12PyClConvolve_13GenericLoader_1getDimensions(CYTHON_U
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("getDimensions", 1, 1, 1, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 55; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("getDimensions", 1, 1, 1, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 63; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("PyClConvolve.GenericLoader.getDimensions", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -3156,17 +3280,17 @@ static PyObject *__pyx_pf_12PyClConvolve_13GenericLoader_getDimensions(PyObject 
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("getDimensions", 0);
 
-  /* "PyClConvolve.pyx":59
+  /* "PyClConvolve.pyx":67
  *         cdef int planes
  *         cdef int size
  *         cClConvolve.GenericLoader.getDimensions( trainFilePath, &N, &planes, &size )             # <<<<<<<<<<<<<<
  *         # print( N )
  *         return (N,planes,size)
  */
-  __pyx_t_1 = __pyx_convert_string_from_py_std__in_string(__pyx_v_trainFilePath); if (unlikely(PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 59; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __pyx_convert_string_from_py_std__in_string(__pyx_v_trainFilePath); if (unlikely(PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 67; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   GenericLoader::getDimensions(__pyx_t_1, (&__pyx_v_N), (&__pyx_v_planes), (&__pyx_v_size));
 
-  /* "PyClConvolve.pyx":61
+  /* "PyClConvolve.pyx":69
  *         cClConvolve.GenericLoader.getDimensions( trainFilePath, &N, &planes, &size )
  *         # print( N )
  *         return (N,planes,size)             # <<<<<<<<<<<<<<
@@ -3174,13 +3298,13 @@ static PyObject *__pyx_pf_12PyClConvolve_13GenericLoader_getDimensions(PyObject 
  *     def loaduc( trainFilepath, unsigned char[:] images, int[:] labels, startN, numExamples ):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_N); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 61; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_N); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 69; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_planes); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 61; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_planes); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 69; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_size); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 61; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_size); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 69; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = PyTuple_New(3); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 61; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_5 = PyTuple_New(3); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 69; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_5);
   PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_2);
@@ -3195,7 +3319,7 @@ static PyObject *__pyx_pf_12PyClConvolve_13GenericLoader_getDimensions(PyObject 
   __pyx_t_5 = 0;
   goto __pyx_L0;
 
-  /* "PyClConvolve.pyx":55
+  /* "PyClConvolve.pyx":63
  * cdef class GenericLoader:
  *     @staticmethod
  *     def getDimensions( trainFilePath ):             # <<<<<<<<<<<<<<
@@ -3217,7 +3341,7 @@ static PyObject *__pyx_pf_12PyClConvolve_13GenericLoader_getDimensions(PyObject 
   return __pyx_r;
 }
 
-/* "PyClConvolve.pyx":63
+/* "PyClConvolve.pyx":71
  *         return (N,planes,size)
  *     @staticmethod
  *     def loaduc( trainFilepath, unsigned char[:] images, int[:] labels, startN, numExamples ):             # <<<<<<<<<<<<<<
@@ -3263,26 +3387,26 @@ static PyObject *__pyx_pw_12PyClConvolve_13GenericLoader_3loaduc(CYTHON_UNUSED P
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_images)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("loaduc", 1, 5, 5, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 63; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("loaduc", 1, 5, 5, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 71; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
         case  2:
         if (likely((values[2] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_labels)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("loaduc", 1, 5, 5, 2); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 63; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("loaduc", 1, 5, 5, 2); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 71; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
         case  3:
         if (likely((values[3] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_startN)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("loaduc", 1, 5, 5, 3); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 63; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("loaduc", 1, 5, 5, 3); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 71; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
         case  4:
         if (likely((values[4] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_numExamples)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("loaduc", 1, 5, 5, 4); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 63; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("loaduc", 1, 5, 5, 4); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 71; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "loaduc") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 63; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "loaduc") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 71; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 5) {
       goto __pyx_L5_argtuple_error;
@@ -3294,14 +3418,14 @@ static PyObject *__pyx_pw_12PyClConvolve_13GenericLoader_3loaduc(CYTHON_UNUSED P
       values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
     }
     __pyx_v_trainFilepath = values[0];
-    __pyx_v_images = __Pyx_PyObject_to_MemoryviewSlice_ds_unsigned_char(values[1]); if (unlikely(!__pyx_v_images.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 63; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
-    __pyx_v_labels = __Pyx_PyObject_to_MemoryviewSlice_ds_int(values[2]); if (unlikely(!__pyx_v_labels.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 63; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+    __pyx_v_images = __Pyx_PyObject_to_MemoryviewSlice_ds_unsigned_char(values[1]); if (unlikely(!__pyx_v_images.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 71; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+    __pyx_v_labels = __Pyx_PyObject_to_MemoryviewSlice_ds_int(values[2]); if (unlikely(!__pyx_v_labels.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 71; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
     __pyx_v_startN = values[3];
     __pyx_v_numExamples = values[4];
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("loaduc", 1, 5, 5, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 63; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("loaduc", 1, 5, 5, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 71; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("PyClConvolve.GenericLoader.loaduc", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -3327,14 +3451,14 @@ static PyObject *__pyx_pf_12PyClConvolve_13GenericLoader_2loaduc(PyObject *__pyx
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("loaduc", 0);
 
-  /* "PyClConvolve.pyx":68
+  /* "PyClConvolve.pyx":76
  *         #cdef unsigned char *images
  *         #cdef int *labels
  *         cClConvolve.GenericLoader.load( trainFilepath, &images[0], &labels[0], startN , numExamples )             # <<<<<<<<<<<<<<
  *         #return (images, labels)
  *     @staticmethod
  */
-  __pyx_t_1 = __pyx_convert_string_from_py_std__in_string(__pyx_v_trainFilepath); if (unlikely(PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 68; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __pyx_convert_string_from_py_std__in_string(__pyx_v_trainFilepath); if (unlikely(PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 76; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_t_2 = 0;
   __pyx_t_3 = -1;
   if (__pyx_t_2 < 0) {
@@ -3343,7 +3467,7 @@ static PyObject *__pyx_pf_12PyClConvolve_13GenericLoader_2loaduc(PyObject *__pyx
   } else if (unlikely(__pyx_t_2 >= __pyx_v_images.shape[0])) __pyx_t_3 = 0;
   if (unlikely(__pyx_t_3 != -1)) {
     __Pyx_RaiseBufferIndexError(__pyx_t_3);
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 68; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 76; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_t_4 = 0;
   __pyx_t_3 = -1;
@@ -3353,13 +3477,13 @@ static PyObject *__pyx_pf_12PyClConvolve_13GenericLoader_2loaduc(PyObject *__pyx
   } else if (unlikely(__pyx_t_4 >= __pyx_v_labels.shape[0])) __pyx_t_3 = 0;
   if (unlikely(__pyx_t_3 != -1)) {
     __Pyx_RaiseBufferIndexError(__pyx_t_3);
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 68; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 76; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
-  __pyx_t_3 = __Pyx_PyInt_As_int(__pyx_v_startN); if (unlikely((__pyx_t_3 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 68; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_t_5 = __Pyx_PyInt_As_int(__pyx_v_numExamples); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 68; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_PyInt_As_int(__pyx_v_startN); if (unlikely((__pyx_t_3 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 76; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_5 = __Pyx_PyInt_As_int(__pyx_v_numExamples); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 76; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   GenericLoader::load(__pyx_t_1, (&(*((unsigned char *) ( /* dim=0 */ (__pyx_v_images.data + __pyx_t_2 * __pyx_v_images.strides[0]) )))), (&(*((int *) ( /* dim=0 */ (__pyx_v_labels.data + __pyx_t_4 * __pyx_v_labels.strides[0]) )))), __pyx_t_3, __pyx_t_5);
 
-  /* "PyClConvolve.pyx":63
+  /* "PyClConvolve.pyx":71
  *         return (N,planes,size)
  *     @staticmethod
  *     def loaduc( trainFilepath, unsigned char[:] images, int[:] labels, startN, numExamples ):             # <<<<<<<<<<<<<<
@@ -3381,7 +3505,7 @@ static PyObject *__pyx_pf_12PyClConvolve_13GenericLoader_2loaduc(PyObject *__pyx
   return __pyx_r;
 }
 
-/* "PyClConvolve.pyx":71
+/* "PyClConvolve.pyx":79
  *         #return (images, labels)
  *     @staticmethod
  *     def load( trainFilepath, float[:] images, int[:] labels, startN, numExamples ):             # <<<<<<<<<<<<<<
@@ -3427,26 +3551,26 @@ static PyObject *__pyx_pw_12PyClConvolve_13GenericLoader_5load(CYTHON_UNUSED PyO
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_images)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("load", 1, 5, 5, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 71; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("load", 1, 5, 5, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 79; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
         case  2:
         if (likely((values[2] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_labels)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("load", 1, 5, 5, 2); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 71; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("load", 1, 5, 5, 2); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 79; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
         case  3:
         if (likely((values[3] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_startN)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("load", 1, 5, 5, 3); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 71; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("load", 1, 5, 5, 3); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 79; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
         case  4:
         if (likely((values[4] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_numExamples)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("load", 1, 5, 5, 4); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 71; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("load", 1, 5, 5, 4); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 79; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "load") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 71; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "load") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 79; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 5) {
       goto __pyx_L5_argtuple_error;
@@ -3458,14 +3582,14 @@ static PyObject *__pyx_pw_12PyClConvolve_13GenericLoader_5load(CYTHON_UNUSED PyO
       values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
     }
     __pyx_v_trainFilepath = values[0];
-    __pyx_v_images = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[1]); if (unlikely(!__pyx_v_images.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 71; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
-    __pyx_v_labels = __Pyx_PyObject_to_MemoryviewSlice_ds_int(values[2]); if (unlikely(!__pyx_v_labels.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 71; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+    __pyx_v_images = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[1]); if (unlikely(!__pyx_v_images.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 79; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+    __pyx_v_labels = __Pyx_PyObject_to_MemoryviewSlice_ds_int(values[2]); if (unlikely(!__pyx_v_labels.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 79; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
     __pyx_v_startN = values[3];
     __pyx_v_numExamples = values[4];
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("load", 1, 5, 5, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 71; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("load", 1, 5, 5, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 79; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("PyClConvolve.GenericLoader.load", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -3508,14 +3632,14 @@ static PyObject *__pyx_pf_12PyClConvolve_13GenericLoader_4load(PyObject *__pyx_v
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("load", 0);
 
-  /* "PyClConvolve.pyx":72
+  /* "PyClConvolve.pyx":80
  *     @staticmethod
  *     def load( trainFilepath, float[:] images, int[:] labels, startN, numExamples ):
  *         (N, planes, size) = GenericLoader.getDimensions(trainFilepath)             # <<<<<<<<<<<<<<
  *         #images = view.array(shape=(N,planes,size,size),itemsize=1,
  *         #cdef unsigned char *images
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)((PyObject*)__pyx_ptype_12PyClConvolve_GenericLoader)), __pyx_n_s_getDimensions); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 72; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)((PyObject*)__pyx_ptype_12PyClConvolve_GenericLoader)), __pyx_n_s_getDimensions); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 80; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_2))) {
@@ -3528,16 +3652,16 @@ static PyObject *__pyx_pf_12PyClConvolve_13GenericLoader_4load(PyObject *__pyx_v
     }
   }
   if (!__pyx_t_3) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_trainFilepath); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 72; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_trainFilepath); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 80; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
   } else {
-    __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 72; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 80; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_3); __Pyx_GIVEREF(__pyx_t_3); __pyx_t_3 = NULL;
     __Pyx_INCREF(__pyx_v_trainFilepath);
     PyTuple_SET_ITEM(__pyx_t_4, 0+1, __pyx_v_trainFilepath);
     __Pyx_GIVEREF(__pyx_v_trainFilepath);
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 72; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 80; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   }
@@ -3552,7 +3676,7 @@ static PyObject *__pyx_pf_12PyClConvolve_13GenericLoader_4load(PyObject *__pyx_v
     if (unlikely(size != 3)) {
       if (size > 3) __Pyx_RaiseTooManyValuesError(3);
       else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 72; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 80; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
     #if CYTHON_COMPILING_IN_CPYTHON
     if (likely(PyTuple_CheckExact(sequence))) {
@@ -3568,17 +3692,17 @@ static PyObject *__pyx_pf_12PyClConvolve_13GenericLoader_4load(PyObject *__pyx_v
     __Pyx_INCREF(__pyx_t_4);
     __Pyx_INCREF(__pyx_t_3);
     #else
-    __pyx_t_2 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 72; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 80; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_4 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 72; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 80; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_3 = PySequence_ITEM(sequence, 2); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 72; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PySequence_ITEM(sequence, 2); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 80; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     #endif
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   } else {
     Py_ssize_t index = -1;
-    __pyx_t_5 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 72; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_5 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 80; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_t_6 = Py_TYPE(__pyx_t_5)->tp_iternext;
@@ -3588,7 +3712,7 @@ static PyObject *__pyx_pf_12PyClConvolve_13GenericLoader_4load(PyObject *__pyx_v
     __Pyx_GOTREF(__pyx_t_4);
     index = 2; __pyx_t_3 = __pyx_t_6(__pyx_t_5); if (unlikely(!__pyx_t_3)) goto __pyx_L3_unpacking_failed;
     __Pyx_GOTREF(__pyx_t_3);
-    if (__Pyx_IternextUnpackEndCheck(__pyx_t_6(__pyx_t_5), 3) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 72; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    if (__Pyx_IternextUnpackEndCheck(__pyx_t_6(__pyx_t_5), 3) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 80; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __pyx_t_6 = NULL;
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     goto __pyx_L4_unpacking_done;
@@ -3596,7 +3720,7 @@ static PyObject *__pyx_pf_12PyClConvolve_13GenericLoader_4load(PyObject *__pyx_v
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __pyx_t_6 = NULL;
     if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 72; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 80; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __pyx_L4_unpacking_done:;
   }
   __pyx_v_N = __pyx_t_2;
@@ -3606,14 +3730,14 @@ static PyObject *__pyx_pf_12PyClConvolve_13GenericLoader_4load(PyObject *__pyx_v
   __pyx_v_size = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "PyClConvolve.pyx":77
+  /* "PyClConvolve.pyx":85
  *         #cdef int *labels
  *         #cdef unsigned char ucImages[numExamples * planes * size * size]
  *         print( (N, planes, size ) )             # <<<<<<<<<<<<<<
  *         cdef c_array.array ucImages = array('B', [0] * (numExamples * planes * size * size) )
  *         cdef unsigned char[:] ucImagesMv = ucImages
  */
-  __pyx_t_1 = PyTuple_New(3); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 77; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyTuple_New(3); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 85; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(__pyx_v_N);
   PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_v_N);
@@ -3624,32 +3748,32 @@ static PyObject *__pyx_pf_12PyClConvolve_13GenericLoader_4load(PyObject *__pyx_v
   __Pyx_INCREF(__pyx_v_size);
   PyTuple_SET_ITEM(__pyx_t_1, 2, __pyx_v_size);
   __Pyx_GIVEREF(__pyx_v_size);
-  if (__Pyx_PrintOne(0, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 77; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (__Pyx_PrintOne(0, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 85; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "PyClConvolve.pyx":78
+  /* "PyClConvolve.pyx":86
  *         #cdef unsigned char ucImages[numExamples * planes * size * size]
  *         print( (N, planes, size ) )
  *         cdef c_array.array ucImages = array('B', [0] * (numExamples * planes * size * size) )             # <<<<<<<<<<<<<<
  *         cdef unsigned char[:] ucImagesMv = ucImages
  *         cClConvolve.GenericLoader.load( trainFilepath, &ucImagesMv[0], &labels[0], startN , numExamples )
  */
-  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_array); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 78; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_array); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 86; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = PyNumber_Multiply(__pyx_v_numExamples, __pyx_v_planes); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 78; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = PyNumber_Multiply(__pyx_v_numExamples, __pyx_v_planes); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 86; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_2 = PyNumber_Multiply(__pyx_t_4, __pyx_v_size); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 78; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyNumber_Multiply(__pyx_t_4, __pyx_v_size); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 86; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = PyNumber_Multiply(__pyx_t_2, __pyx_v_size); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 78; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = PyNumber_Multiply(__pyx_t_2, __pyx_v_size); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 86; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = PyList_New(1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 78; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyList_New(1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 86; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_INCREF(__pyx_int_0);
   PyList_SET_ITEM(__pyx_t_2, 0, __pyx_int_0);
   __Pyx_GIVEREF(__pyx_int_0);
-  { PyObject* __pyx_temp = PyNumber_InPlaceMultiply(__pyx_t_2, __pyx_t_4); if (unlikely(!__pyx_temp)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 78; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  { PyObject* __pyx_temp = PyNumber_InPlaceMultiply(__pyx_t_2, __pyx_t_4); if (unlikely(!__pyx_temp)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 86; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_temp);
     __Pyx_DECREF(__pyx_t_2);
     __pyx_t_2 = __pyx_temp;
@@ -3667,7 +3791,7 @@ static PyObject *__pyx_pf_12PyClConvolve_13GenericLoader_4load(PyObject *__pyx_v
       __pyx_t_7 = 1;
     }
   }
-  __pyx_t_5 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 78; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_5 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 86; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_5);
   if (__pyx_t_4) {
     PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_4); __Pyx_GIVEREF(__pyx_t_4); __pyx_t_4 = NULL;
@@ -3678,15 +3802,15 @@ static PyObject *__pyx_pf_12PyClConvolve_13GenericLoader_4load(PyObject *__pyx_v
   PyTuple_SET_ITEM(__pyx_t_5, 1+__pyx_t_7, __pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_2);
   __pyx_t_2 = 0;
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 78; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 86; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (!(likely(((__pyx_t_1) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_7cpython_5array_array))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 78; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (!(likely(((__pyx_t_1) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_7cpython_5array_array))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 86; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_ucImages = ((arrayobject *)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "PyClConvolve.pyx":79
+  /* "PyClConvolve.pyx":87
  *         print( (N, planes, size ) )
  *         cdef c_array.array ucImages = array('B', [0] * (numExamples * planes * size * size) )
  *         cdef unsigned char[:] ucImagesMv = ucImages             # <<<<<<<<<<<<<<
@@ -3694,19 +3818,19 @@ static PyObject *__pyx_pf_12PyClConvolve_13GenericLoader_4load(PyObject *__pyx_v
  *         #return (images, labels)
  */
   __pyx_t_8 = __Pyx_PyObject_to_MemoryviewSlice_ds_unsigned_char(((PyObject *)__pyx_v_ucImages));
-  if (unlikely(!__pyx_t_8.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 79; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__pyx_t_8.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 87; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_ucImagesMv = __pyx_t_8;
   __pyx_t_8.memview = NULL;
   __pyx_t_8.data = NULL;
 
-  /* "PyClConvolve.pyx":80
+  /* "PyClConvolve.pyx":88
  *         cdef c_array.array ucImages = array('B', [0] * (numExamples * planes * size * size) )
  *         cdef unsigned char[:] ucImagesMv = ucImages
  *         cClConvolve.GenericLoader.load( trainFilepath, &ucImagesMv[0], &labels[0], startN , numExamples )             # <<<<<<<<<<<<<<
  *         #return (images, labels)
  *         cdef int i
  */
-  __pyx_t_9 = __pyx_convert_string_from_py_std__in_string(__pyx_v_trainFilepath); if (unlikely(PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 80; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_9 = __pyx_convert_string_from_py_std__in_string(__pyx_v_trainFilepath); if (unlikely(PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 88; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_t_7 = 0;
   __pyx_t_10 = -1;
   if (__pyx_t_7 < 0) {
@@ -3715,7 +3839,7 @@ static PyObject *__pyx_pf_12PyClConvolve_13GenericLoader_4load(PyObject *__pyx_v
   } else if (unlikely(__pyx_t_7 >= __pyx_v_ucImagesMv.shape[0])) __pyx_t_10 = 0;
   if (unlikely(__pyx_t_10 != -1)) {
     __Pyx_RaiseBufferIndexError(__pyx_t_10);
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 80; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 88; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_t_11 = 0;
   __pyx_t_10 = -1;
@@ -3725,44 +3849,44 @@ static PyObject *__pyx_pf_12PyClConvolve_13GenericLoader_4load(PyObject *__pyx_v
   } else if (unlikely(__pyx_t_11 >= __pyx_v_labels.shape[0])) __pyx_t_10 = 0;
   if (unlikely(__pyx_t_10 != -1)) {
     __Pyx_RaiseBufferIndexError(__pyx_t_10);
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 80; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 88; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
-  __pyx_t_10 = __Pyx_PyInt_As_int(__pyx_v_startN); if (unlikely((__pyx_t_10 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 80; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_t_12 = __Pyx_PyInt_As_int(__pyx_v_numExamples); if (unlikely((__pyx_t_12 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 80; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_10 = __Pyx_PyInt_As_int(__pyx_v_startN); if (unlikely((__pyx_t_10 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 88; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_12 = __Pyx_PyInt_As_int(__pyx_v_numExamples); if (unlikely((__pyx_t_12 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 88; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   GenericLoader::load(__pyx_t_9, (&(*((unsigned char *) ( /* dim=0 */ (__pyx_v_ucImagesMv.data + __pyx_t_7 * __pyx_v_ucImagesMv.strides[0]) )))), (&(*((int *) ( /* dim=0 */ (__pyx_v_labels.data + __pyx_t_11 * __pyx_v_labels.strides[0]) )))), __pyx_t_10, __pyx_t_12);
 
-  /* "PyClConvolve.pyx":84
+  /* "PyClConvolve.pyx":92
  *         cdef int i
  *         cdef int total
  *         total = numExamples * planes * size * size             # <<<<<<<<<<<<<<
  *         print(total)
  *         for i in range(total):
  */
-  __pyx_t_1 = PyNumber_Multiply(__pyx_v_numExamples, __pyx_v_planes); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 84; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyNumber_Multiply(__pyx_v_numExamples, __pyx_v_planes); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 92; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = PyNumber_Multiply(__pyx_t_1, __pyx_v_size); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 84; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = PyNumber_Multiply(__pyx_t_1, __pyx_v_size); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 92; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyNumber_Multiply(__pyx_t_3, __pyx_v_size); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 84; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyNumber_Multiply(__pyx_t_3, __pyx_v_size); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 92; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_12 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_12 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 84; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_12 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_12 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 92; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_total = __pyx_t_12;
 
-  /* "PyClConvolve.pyx":85
+  /* "PyClConvolve.pyx":93
  *         cdef int total
  *         total = numExamples * planes * size * size
  *         print(total)             # <<<<<<<<<<<<<<
  *         for i in range(total):
  *             images[i] = ucImagesMv[i]
  */
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_total); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 85; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_total); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 93; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  if (__Pyx_PrintOne(0, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 85; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (__Pyx_PrintOne(0, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 93; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "PyClConvolve.pyx":86
+  /* "PyClConvolve.pyx":94
  *         total = numExamples * planes * size * size
  *         print(total)
  *         for i in range(total):             # <<<<<<<<<<<<<<
@@ -3773,11 +3897,12 @@ static PyObject *__pyx_pf_12PyClConvolve_13GenericLoader_4load(PyObject *__pyx_v
   for (__pyx_t_10 = 0; __pyx_t_10 < __pyx_t_12; __pyx_t_10+=1) {
     __pyx_v_i = __pyx_t_10;
 
-    /* "PyClConvolve.pyx":87
+    /* "PyClConvolve.pyx":95
  *         print(total)
  *         for i in range(total):
  *             images[i] = ucImagesMv[i]             # <<<<<<<<<<<<<<
  * 
+ * cdef class NormalizationLayerMaker:
  */
     __pyx_t_13 = __pyx_v_i;
     __pyx_t_14 = -1;
@@ -3787,7 +3912,7 @@ static PyObject *__pyx_pf_12PyClConvolve_13GenericLoader_4load(PyObject *__pyx_v
     } else if (unlikely(__pyx_t_13 >= __pyx_v_ucImagesMv.shape[0])) __pyx_t_14 = 0;
     if (unlikely(__pyx_t_14 != -1)) {
       __Pyx_RaiseBufferIndexError(__pyx_t_14);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 87; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 95; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
     __pyx_t_14 = __pyx_v_i;
     __pyx_t_15 = -1;
@@ -3797,12 +3922,12 @@ static PyObject *__pyx_pf_12PyClConvolve_13GenericLoader_4load(PyObject *__pyx_v
     } else if (unlikely(__pyx_t_14 >= __pyx_v_images.shape[0])) __pyx_t_15 = 0;
     if (unlikely(__pyx_t_15 != -1)) {
       __Pyx_RaiseBufferIndexError(__pyx_t_15);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 87; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 95; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
     *((float *) ( /* dim=0 */ (__pyx_v_images.data + __pyx_t_14 * __pyx_v_images.strides[0]) )) = (*((unsigned char *) ( /* dim=0 */ (__pyx_v_ucImagesMv.data + __pyx_t_13 * __pyx_v_ucImagesMv.strides[0]) )));
   }
 
-  /* "PyClConvolve.pyx":71
+  /* "PyClConvolve.pyx":79
  *         #return (images, labels)
  *     @staticmethod
  *     def load( trainFilepath, float[:] images, int[:] labels, startN, numExamples ):             # <<<<<<<<<<<<<<
@@ -3830,6 +3955,289 @@ static PyObject *__pyx_pf_12PyClConvolve_13GenericLoader_4load(PyObject *__pyx_v
   __PYX_XDEC_MEMVIEW(&__pyx_v_ucImagesMv, 1);
   __PYX_XDEC_MEMVIEW(&__pyx_v_images, 1);
   __PYX_XDEC_MEMVIEW(&__pyx_v_labels, 1);
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "PyClConvolve.pyx":99
+ * cdef class NormalizationLayerMaker:
+ *     cdef cClConvolve.NormalizationLayerMaker *thisptr
+ *     def __cinit__( self ):             # <<<<<<<<<<<<<<
+ *         self.thisptr = new cClConvolve.NormalizationLayerMaker()
+ *     def translate( self, float _translate ):
+ */
+
+/* Python wrapper */
+static int __pyx_pw_12PyClConvolve_23NormalizationLayerMaker_1__cinit__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static int __pyx_pw_12PyClConvolve_23NormalizationLayerMaker_1__cinit__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__cinit__ (wrapper)", 0);
+  if (unlikely(PyTuple_GET_SIZE(__pyx_args) > 0)) {
+    __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 0, 0, PyTuple_GET_SIZE(__pyx_args)); return -1;}
+  if (unlikely(__pyx_kwds) && unlikely(PyDict_Size(__pyx_kwds) > 0) && unlikely(!__Pyx_CheckKeywordStrings(__pyx_kwds, "__cinit__", 0))) return -1;
+  __pyx_r = __pyx_pf_12PyClConvolve_23NormalizationLayerMaker___cinit__(((struct __pyx_obj_12PyClConvolve_NormalizationLayerMaker *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static int __pyx_pf_12PyClConvolve_23NormalizationLayerMaker___cinit__(struct __pyx_obj_12PyClConvolve_NormalizationLayerMaker *__pyx_v_self) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  NormalizationLayerMaker *__pyx_t_1;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("__cinit__", 0);
+
+  /* "PyClConvolve.pyx":100
+ *     cdef cClConvolve.NormalizationLayerMaker *thisptr
+ *     def __cinit__( self ):
+ *         self.thisptr = new cClConvolve.NormalizationLayerMaker()             # <<<<<<<<<<<<<<
+ *     def translate( self, float _translate ):
+ *         self.thisptr.translate( _translate )
+ */
+  try {
+    __pyx_t_1 = new NormalizationLayerMaker();
+  } catch(...) {
+    __Pyx_CppExn2PyErr();
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 100; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  }
+  __pyx_v_self->thisptr = __pyx_t_1;
+
+  /* "PyClConvolve.pyx":99
+ * cdef class NormalizationLayerMaker:
+ *     cdef cClConvolve.NormalizationLayerMaker *thisptr
+ *     def __cinit__( self ):             # <<<<<<<<<<<<<<
+ *         self.thisptr = new cClConvolve.NormalizationLayerMaker()
+ *     def translate( self, float _translate ):
+ */
+
+  /* function exit code */
+  __pyx_r = 0;
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_AddTraceback("PyClConvolve.NormalizationLayerMaker.__cinit__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = -1;
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "PyClConvolve.pyx":101
+ *     def __cinit__( self ):
+ *         self.thisptr = new cClConvolve.NormalizationLayerMaker()
+ *     def translate( self, float _translate ):             # <<<<<<<<<<<<<<
+ *         self.thisptr.translate( _translate )
+ *         return self
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_12PyClConvolve_23NormalizationLayerMaker_3translate(PyObject *__pyx_v_self, PyObject *__pyx_arg__translate); /*proto*/
+static PyObject *__pyx_pw_12PyClConvolve_23NormalizationLayerMaker_3translate(PyObject *__pyx_v_self, PyObject *__pyx_arg__translate) {
+  float __pyx_v__translate;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("translate (wrapper)", 0);
+  assert(__pyx_arg__translate); {
+    __pyx_v__translate = __pyx_PyFloat_AsFloat(__pyx_arg__translate); if (unlikely((__pyx_v__translate == (float)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 101; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  }
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L3_error:;
+  __Pyx_AddTraceback("PyClConvolve.NormalizationLayerMaker.translate", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_RefNannyFinishContext();
+  return NULL;
+  __pyx_L4_argument_unpacking_done:;
+  __pyx_r = __pyx_pf_12PyClConvolve_23NormalizationLayerMaker_2translate(((struct __pyx_obj_12PyClConvolve_NormalizationLayerMaker *)__pyx_v_self), ((float)__pyx_v__translate));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_12PyClConvolve_23NormalizationLayerMaker_2translate(struct __pyx_obj_12PyClConvolve_NormalizationLayerMaker *__pyx_v_self, float __pyx_v__translate) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("translate", 0);
+
+  /* "PyClConvolve.pyx":102
+ *         self.thisptr = new cClConvolve.NormalizationLayerMaker()
+ *     def translate( self, float _translate ):
+ *         self.thisptr.translate( _translate )             # <<<<<<<<<<<<<<
+ *         return self
+ *     def scale( self, float _scale ):
+ */
+  __pyx_v_self->thisptr->translate(__pyx_v__translate);
+
+  /* "PyClConvolve.pyx":103
+ *     def translate( self, float _translate ):
+ *         self.thisptr.translate( _translate )
+ *         return self             # <<<<<<<<<<<<<<
+ *     def scale( self, float _scale ):
+ *         self.thisptr.scale( _scale )
+ */
+  __Pyx_XDECREF(__pyx_r);
+  __Pyx_INCREF(((PyObject *)__pyx_v_self));
+  __pyx_r = ((PyObject *)__pyx_v_self);
+  goto __pyx_L0;
+
+  /* "PyClConvolve.pyx":101
+ *     def __cinit__( self ):
+ *         self.thisptr = new cClConvolve.NormalizationLayerMaker()
+ *     def translate( self, float _translate ):             # <<<<<<<<<<<<<<
+ *         self.thisptr.translate( _translate )
+ *         return self
+ */
+
+  /* function exit code */
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "PyClConvolve.pyx":104
+ *         self.thisptr.translate( _translate )
+ *         return self
+ *     def scale( self, float _scale ):             # <<<<<<<<<<<<<<
+ *         self.thisptr.scale( _scale )
+ *         return self
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_12PyClConvolve_23NormalizationLayerMaker_5scale(PyObject *__pyx_v_self, PyObject *__pyx_arg__scale); /*proto*/
+static PyObject *__pyx_pw_12PyClConvolve_23NormalizationLayerMaker_5scale(PyObject *__pyx_v_self, PyObject *__pyx_arg__scale) {
+  float __pyx_v__scale;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("scale (wrapper)", 0);
+  assert(__pyx_arg__scale); {
+    __pyx_v__scale = __pyx_PyFloat_AsFloat(__pyx_arg__scale); if (unlikely((__pyx_v__scale == (float)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 104; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  }
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L3_error:;
+  __Pyx_AddTraceback("PyClConvolve.NormalizationLayerMaker.scale", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_RefNannyFinishContext();
+  return NULL;
+  __pyx_L4_argument_unpacking_done:;
+  __pyx_r = __pyx_pf_12PyClConvolve_23NormalizationLayerMaker_4scale(((struct __pyx_obj_12PyClConvolve_NormalizationLayerMaker *)__pyx_v_self), ((float)__pyx_v__scale));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_12PyClConvolve_23NormalizationLayerMaker_4scale(struct __pyx_obj_12PyClConvolve_NormalizationLayerMaker *__pyx_v_self, float __pyx_v__scale) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("scale", 0);
+
+  /* "PyClConvolve.pyx":105
+ *         return self
+ *     def scale( self, float _scale ):
+ *         self.thisptr.scale( _scale )             # <<<<<<<<<<<<<<
+ *         return self
+ *     @staticmethod
+ */
+  __pyx_v_self->thisptr->scale(__pyx_v__scale);
+
+  /* "PyClConvolve.pyx":106
+ *     def scale( self, float _scale ):
+ *         self.thisptr.scale( _scale )
+ *         return self             # <<<<<<<<<<<<<<
+ *     @staticmethod
+ *     def instance():
+ */
+  __Pyx_XDECREF(__pyx_r);
+  __Pyx_INCREF(((PyObject *)__pyx_v_self));
+  __pyx_r = ((PyObject *)__pyx_v_self);
+  goto __pyx_L0;
+
+  /* "PyClConvolve.pyx":104
+ *         self.thisptr.translate( _translate )
+ *         return self
+ *     def scale( self, float _scale ):             # <<<<<<<<<<<<<<
+ *         self.thisptr.scale( _scale )
+ *         return self
+ */
+
+  /* function exit code */
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "PyClConvolve.pyx":108
+ *         return self
+ *     @staticmethod
+ *     def instance():             # <<<<<<<<<<<<<<
+ *         return NormalizationLayerMaker()
+ * 
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_12PyClConvolve_23NormalizationLayerMaker_7instance(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_12PyClConvolve_23NormalizationLayerMaker_7instance = {"instance", (PyCFunction)__pyx_pw_12PyClConvolve_23NormalizationLayerMaker_7instance, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_12PyClConvolve_23NormalizationLayerMaker_7instance(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("instance (wrapper)", 0);
+  if (unlikely(PyTuple_GET_SIZE(__pyx_args) > 0)) {
+    __Pyx_RaiseArgtupleInvalid("instance", 1, 0, 0, PyTuple_GET_SIZE(__pyx_args)); return NULL;}
+  if (unlikely(__pyx_kwds) && unlikely(PyDict_Size(__pyx_kwds) > 0) && unlikely(!__Pyx_CheckKeywordStrings(__pyx_kwds, "instance", 0))) return NULL;
+  __pyx_r = __pyx_pf_12PyClConvolve_23NormalizationLayerMaker_6instance();
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_12PyClConvolve_23NormalizationLayerMaker_6instance() {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("instance", 0);
+
+  /* "PyClConvolve.pyx":109
+ *     @staticmethod
+ *     def instance():
+ *         return NormalizationLayerMaker()             # <<<<<<<<<<<<<<
+ * 
+ */
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)((PyObject*)__pyx_ptype_12PyClConvolve_NormalizationLayerMaker)), __pyx_empty_tuple, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 109; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* "PyClConvolve.pyx":108
+ *         return self
+ *     @staticmethod
+ *     def instance():             # <<<<<<<<<<<<<<
+ *         return NormalizationLayerMaker()
+ * 
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("PyClConvolve.NormalizationLayerMaker.instance", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
@@ -15429,6 +15837,7 @@ static PyMethodDef __pyx_methods_12PyClConvolve_NeuralNet[] = {
   {"backPropFromLabels", (PyCFunction)__pyx_pw_12PyClConvolve_9NeuralNet_9backPropFromLabels, METH_VARARGS|METH_KEYWORDS, 0},
   {"backProp", (PyCFunction)__pyx_pw_12PyClConvolve_9NeuralNet_11backProp, METH_VARARGS|METH_KEYWORDS, 0},
   {"calcNumRight", (PyCFunction)__pyx_pw_12PyClConvolve_9NeuralNet_13calcNumRight, METH_O, 0},
+  {"addLayer", (PyCFunction)__pyx_pw_12PyClConvolve_9NeuralNet_15addLayer, METH_O, 0},
   {0, 0, 0, 0}
 };
 
@@ -15731,6 +16140,93 @@ static PyTypeObject __pyx_type_12PyClConvolve_GenericLoader = {
   0, /*tp_init*/
   0, /*tp_alloc*/
   __pyx_tp_new_12PyClConvolve_GenericLoader, /*tp_new*/
+  0, /*tp_free*/
+  0, /*tp_is_gc*/
+  0, /*tp_bases*/
+  0, /*tp_mro*/
+  0, /*tp_cache*/
+  0, /*tp_subclasses*/
+  0, /*tp_weaklist*/
+  0, /*tp_del*/
+  0, /*tp_version_tag*/
+  #if PY_VERSION_HEX >= 0x030400a1
+  0, /*tp_finalize*/
+  #endif
+};
+
+static PyObject *__pyx_tp_new_12PyClConvolve_NormalizationLayerMaker(PyTypeObject *t, CYTHON_UNUSED PyObject *a, CYTHON_UNUSED PyObject *k) {
+  PyObject *o;
+  if (likely((t->tp_flags & Py_TPFLAGS_IS_ABSTRACT) == 0)) {
+    o = (*t->tp_alloc)(t, 0);
+  } else {
+    o = (PyObject *) PyBaseObject_Type.tp_new(t, __pyx_empty_tuple, 0);
+  }
+  if (unlikely(!o)) return 0;
+  if (unlikely(__pyx_pw_12PyClConvolve_23NormalizationLayerMaker_1__cinit__(o, __pyx_empty_tuple, NULL) < 0)) {
+    Py_DECREF(o); o = 0;
+  }
+  return o;
+}
+
+static void __pyx_tp_dealloc_12PyClConvolve_NormalizationLayerMaker(PyObject *o) {
+  #if PY_VERSION_HEX >= 0x030400a1
+  if (unlikely(Py_TYPE(o)->tp_finalize) && (!PyType_IS_GC(Py_TYPE(o)) || !_PyGC_FINALIZED(o))) {
+    if (PyObject_CallFinalizerFromDealloc(o)) return;
+  }
+  #endif
+  (*Py_TYPE(o)->tp_free)(o);
+}
+
+static PyMethodDef __pyx_methods_12PyClConvolve_NormalizationLayerMaker[] = {
+  {"translate", (PyCFunction)__pyx_pw_12PyClConvolve_23NormalizationLayerMaker_3translate, METH_O, 0},
+  {"scale", (PyCFunction)__pyx_pw_12PyClConvolve_23NormalizationLayerMaker_5scale, METH_O, 0},
+  {"instance", (PyCFunction)__pyx_pw_12PyClConvolve_23NormalizationLayerMaker_7instance, METH_VARARGS|METH_KEYWORDS, 0},
+  {0, 0, 0, 0}
+};
+
+static PyTypeObject __pyx_type_12PyClConvolve_NormalizationLayerMaker = {
+  PyVarObject_HEAD_INIT(0, 0)
+  "PyClConvolve.NormalizationLayerMaker", /*tp_name*/
+  sizeof(struct __pyx_obj_12PyClConvolve_NormalizationLayerMaker), /*tp_basicsize*/
+  0, /*tp_itemsize*/
+  __pyx_tp_dealloc_12PyClConvolve_NormalizationLayerMaker, /*tp_dealloc*/
+  0, /*tp_print*/
+  0, /*tp_getattr*/
+  0, /*tp_setattr*/
+  #if PY_MAJOR_VERSION < 3
+  0, /*tp_compare*/
+  #else
+  0, /*reserved*/
+  #endif
+  0, /*tp_repr*/
+  0, /*tp_as_number*/
+  0, /*tp_as_sequence*/
+  0, /*tp_as_mapping*/
+  0, /*tp_hash*/
+  0, /*tp_call*/
+  0, /*tp_str*/
+  0, /*tp_getattro*/
+  0, /*tp_setattro*/
+  0, /*tp_as_buffer*/
+  Py_TPFLAGS_DEFAULT|Py_TPFLAGS_HAVE_VERSION_TAG|Py_TPFLAGS_CHECKTYPES|Py_TPFLAGS_HAVE_NEWBUFFER|Py_TPFLAGS_BASETYPE, /*tp_flags*/
+  0, /*tp_doc*/
+  0, /*tp_traverse*/
+  0, /*tp_clear*/
+  0, /*tp_richcompare*/
+  0, /*tp_weaklistoffset*/
+  0, /*tp_iter*/
+  0, /*tp_iternext*/
+  __pyx_methods_12PyClConvolve_NormalizationLayerMaker, /*tp_methods*/
+  0, /*tp_members*/
+  0, /*tp_getset*/
+  0, /*tp_base*/
+  0, /*tp_dict*/
+  0, /*tp_descr_get*/
+  0, /*tp_descr_set*/
+  0, /*tp_dictoffset*/
+  0, /*tp_init*/
+  0, /*tp_alloc*/
+  __pyx_tp_new_12PyClConvolve_NormalizationLayerMaker, /*tp_new*/
   0, /*tp_free*/
   0, /*tp_is_gc*/
   0, /*tp_bases*/
@@ -16471,6 +16967,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_id, __pyx_k_id, sizeof(__pyx_k_id), 0, 0, 1, 1},
   {&__pyx_n_s_images, __pyx_k_images, sizeof(__pyx_k_images), 0, 0, 1, 1},
   {&__pyx_n_s_import, __pyx_k_import, sizeof(__pyx_k_import), 0, 0, 1, 1},
+  {&__pyx_n_s_instance, __pyx_k_instance, sizeof(__pyx_k_instance), 0, 0, 1, 1},
   {&__pyx_n_s_itemsize, __pyx_k_itemsize, sizeof(__pyx_k_itemsize), 0, 0, 1, 1},
   {&__pyx_kp_s_itemsize_0_for_cython_array, __pyx_k_itemsize_0_for_cython_array, sizeof(__pyx_k_itemsize_0_for_cython_array), 0, 0, 1, 0},
   {&__pyx_n_s_labels, __pyx_k_labels, sizeof(__pyx_k_labels), 0, 0, 1, 1},
@@ -16520,8 +17017,8 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {0, 0, 0, 0, 0, 0, 0}
 };
 static int __Pyx_InitCachedBuiltins(void) {
-  __pyx_builtin_staticmethod = __Pyx_GetBuiltinName(__pyx_n_s_staticmethod); if (!__pyx_builtin_staticmethod) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 32; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 86; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_builtin_staticmethod = __Pyx_GetBuiltinName(__pyx_n_s_staticmethod); if (!__pyx_builtin_staticmethod) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 40; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 94; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_builtin_MemoryError = __Pyx_GetBuiltinName(__pyx_n_s_MemoryError); if (!__pyx_builtin_MemoryError) {__pyx_filename = __pyx_f[1]; __pyx_lineno = 107; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_builtin_ValueError = __Pyx_GetBuiltinName(__pyx_n_s_ValueError); if (!__pyx_builtin_ValueError) {__pyx_filename = __pyx_f[2]; __pyx_lineno = 127; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_builtin_enumerate = __Pyx_GetBuiltinName(__pyx_n_s_enumerate); if (!__pyx_builtin_enumerate) {__pyx_filename = __pyx_f[2]; __pyx_lineno = 145; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
@@ -16673,53 +17170,62 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__12);
   __Pyx_GIVEREF(__pyx_tuple__12);
 
-  /* "PyClConvolve.pyx":33
+  /* "PyClConvolve.pyx":41
  * cdef class NetdefToNet:
  *     @staticmethod
  *     def createNetFromNetdef( NeuralNet neuralnet, netdef ):             # <<<<<<<<<<<<<<
  *         return cClConvolve.NetdefToNet.createNetFromNetdef( neuralnet.thisptr, netdef )
  * 
  */
-  __pyx_tuple__13 = PyTuple_Pack(2, __pyx_n_s_neuralnet, __pyx_n_s_netdef); if (unlikely(!__pyx_tuple__13)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 33; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_tuple__13 = PyTuple_Pack(2, __pyx_n_s_neuralnet, __pyx_n_s_netdef); if (unlikely(!__pyx_tuple__13)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 41; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple__13);
   __Pyx_GIVEREF(__pyx_tuple__13);
-  __pyx_codeobj__14 = (PyObject*)__Pyx_PyCode_New(2, 0, 2, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__13, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_data_norep_git_PyClConvolve_PyC, __pyx_n_s_createNetFromNetdef, 33, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__14)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 33; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_codeobj__14 = (PyObject*)__Pyx_PyCode_New(2, 0, 2, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__13, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_data_norep_git_PyClConvolve_PyC, __pyx_n_s_createNetFromNetdef, 41, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__14)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 41; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "PyClConvolve.pyx":55
+  /* "PyClConvolve.pyx":63
  * cdef class GenericLoader:
  *     @staticmethod
  *     def getDimensions( trainFilePath ):             # <<<<<<<<<<<<<<
  *         cdef int N
  *         cdef int planes
  */
-  __pyx_tuple__15 = PyTuple_Pack(4, __pyx_n_s_trainFilePath, __pyx_n_s_N, __pyx_n_s_planes, __pyx_n_s_size); if (unlikely(!__pyx_tuple__15)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 55; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_tuple__15 = PyTuple_Pack(4, __pyx_n_s_trainFilePath, __pyx_n_s_N, __pyx_n_s_planes, __pyx_n_s_size); if (unlikely(!__pyx_tuple__15)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 63; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple__15);
   __Pyx_GIVEREF(__pyx_tuple__15);
-  __pyx_codeobj__16 = (PyObject*)__Pyx_PyCode_New(1, 0, 4, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__15, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_data_norep_git_PyClConvolve_PyC, __pyx_n_s_getDimensions, 55, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__16)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 55; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_codeobj__16 = (PyObject*)__Pyx_PyCode_New(1, 0, 4, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__15, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_data_norep_git_PyClConvolve_PyC, __pyx_n_s_getDimensions, 63, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__16)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 63; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "PyClConvolve.pyx":63
+  /* "PyClConvolve.pyx":71
  *         return (N,planes,size)
  *     @staticmethod
  *     def loaduc( trainFilepath, unsigned char[:] images, int[:] labels, startN, numExamples ):             # <<<<<<<<<<<<<<
  *         #(N, planes, size) = getDimensions(trainFilepath)
  *         #images = view.array(shape=(N,planes,size,size),itemsize=1,
  */
-  __pyx_tuple__17 = PyTuple_Pack(5, __pyx_n_s_trainFilepath, __pyx_n_s_images, __pyx_n_s_labels, __pyx_n_s_startN, __pyx_n_s_numExamples); if (unlikely(!__pyx_tuple__17)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 63; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_tuple__17 = PyTuple_Pack(5, __pyx_n_s_trainFilepath, __pyx_n_s_images, __pyx_n_s_labels, __pyx_n_s_startN, __pyx_n_s_numExamples); if (unlikely(!__pyx_tuple__17)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 71; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple__17);
   __Pyx_GIVEREF(__pyx_tuple__17);
-  __pyx_codeobj__18 = (PyObject*)__Pyx_PyCode_New(5, 0, 5, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__17, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_data_norep_git_PyClConvolve_PyC, __pyx_n_s_loaduc, 63, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__18)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 63; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_codeobj__18 = (PyObject*)__Pyx_PyCode_New(5, 0, 5, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__17, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_data_norep_git_PyClConvolve_PyC, __pyx_n_s_loaduc, 71, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__18)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 71; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "PyClConvolve.pyx":71
+  /* "PyClConvolve.pyx":79
  *         #return (images, labels)
  *     @staticmethod
  *     def load( trainFilepath, float[:] images, int[:] labels, startN, numExamples ):             # <<<<<<<<<<<<<<
  *         (N, planes, size) = GenericLoader.getDimensions(trainFilepath)
  *         #images = view.array(shape=(N,planes,size,size),itemsize=1,
  */
-  __pyx_tuple__19 = PyTuple_Pack(12, __pyx_n_s_trainFilepath, __pyx_n_s_images, __pyx_n_s_labels, __pyx_n_s_startN, __pyx_n_s_numExamples, __pyx_n_s_N, __pyx_n_s_planes, __pyx_n_s_size, __pyx_n_s_ucImages, __pyx_n_s_ucImagesMv, __pyx_n_s_i, __pyx_n_s_total); if (unlikely(!__pyx_tuple__19)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 71; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_tuple__19 = PyTuple_Pack(12, __pyx_n_s_trainFilepath, __pyx_n_s_images, __pyx_n_s_labels, __pyx_n_s_startN, __pyx_n_s_numExamples, __pyx_n_s_N, __pyx_n_s_planes, __pyx_n_s_size, __pyx_n_s_ucImages, __pyx_n_s_ucImagesMv, __pyx_n_s_i, __pyx_n_s_total); if (unlikely(!__pyx_tuple__19)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 79; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple__19);
   __Pyx_GIVEREF(__pyx_tuple__19);
-  __pyx_codeobj__20 = (PyObject*)__Pyx_PyCode_New(5, 0, 12, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__19, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_data_norep_git_PyClConvolve_PyC, __pyx_n_s_load, 71, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__20)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 71; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_codeobj__20 = (PyObject*)__Pyx_PyCode_New(5, 0, 12, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__19, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_data_norep_git_PyClConvolve_PyC, __pyx_n_s_load, 79, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__20)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 79; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+
+  /* "PyClConvolve.pyx":108
+ *         return self
+ *     @staticmethod
+ *     def instance():             # <<<<<<<<<<<<<<
+ *         return NormalizationLayerMaker()
+ * 
+ */
+  __pyx_codeobj__21 = (PyObject*)__Pyx_PyCode_New(0, 0, 0, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_data_norep_git_PyClConvolve_PyC, __pyx_n_s_instance, 108, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__21)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 108; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
   /* "View.MemoryView":276
  *         return self.name
@@ -16728,9 +17234,9 @@ static int __Pyx_InitCachedConstants(void) {
  * cdef strided = Enum("<strided and direct>") # default
  * cdef indirect = Enum("<strided and indirect>")
  */
-  __pyx_tuple__21 = PyTuple_Pack(1, __pyx_kp_s_strided_and_direct_or_indirect); if (unlikely(!__pyx_tuple__21)) {__pyx_filename = __pyx_f[2]; __pyx_lineno = 276; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_GOTREF(__pyx_tuple__21);
-  __Pyx_GIVEREF(__pyx_tuple__21);
+  __pyx_tuple__22 = PyTuple_Pack(1, __pyx_kp_s_strided_and_direct_or_indirect); if (unlikely(!__pyx_tuple__22)) {__pyx_filename = __pyx_f[2]; __pyx_lineno = 276; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_tuple__22);
+  __Pyx_GIVEREF(__pyx_tuple__22);
 
   /* "View.MemoryView":277
  * 
@@ -16739,9 +17245,9 @@ static int __Pyx_InitCachedConstants(void) {
  * cdef indirect = Enum("<strided and indirect>")
  * 
  */
-  __pyx_tuple__22 = PyTuple_Pack(1, __pyx_kp_s_strided_and_direct); if (unlikely(!__pyx_tuple__22)) {__pyx_filename = __pyx_f[2]; __pyx_lineno = 277; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_GOTREF(__pyx_tuple__22);
-  __Pyx_GIVEREF(__pyx_tuple__22);
+  __pyx_tuple__23 = PyTuple_Pack(1, __pyx_kp_s_strided_and_direct); if (unlikely(!__pyx_tuple__23)) {__pyx_filename = __pyx_f[2]; __pyx_lineno = 277; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_tuple__23);
+  __Pyx_GIVEREF(__pyx_tuple__23);
 
   /* "View.MemoryView":278
  * cdef generic = Enum("<strided and direct or indirect>")
@@ -16750,9 +17256,9 @@ static int __Pyx_InitCachedConstants(void) {
  * 
  * 
  */
-  __pyx_tuple__23 = PyTuple_Pack(1, __pyx_kp_s_strided_and_indirect); if (unlikely(!__pyx_tuple__23)) {__pyx_filename = __pyx_f[2]; __pyx_lineno = 278; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_GOTREF(__pyx_tuple__23);
-  __Pyx_GIVEREF(__pyx_tuple__23);
+  __pyx_tuple__24 = PyTuple_Pack(1, __pyx_kp_s_strided_and_indirect); if (unlikely(!__pyx_tuple__24)) {__pyx_filename = __pyx_f[2]; __pyx_lineno = 278; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_tuple__24);
+  __Pyx_GIVEREF(__pyx_tuple__24);
 
   /* "View.MemoryView":281
  * 
@@ -16761,9 +17267,9 @@ static int __Pyx_InitCachedConstants(void) {
  * cdef indirect_contiguous = Enum("<contiguous and indirect>")
  * 
  */
-  __pyx_tuple__24 = PyTuple_Pack(1, __pyx_kp_s_contiguous_and_direct); if (unlikely(!__pyx_tuple__24)) {__pyx_filename = __pyx_f[2]; __pyx_lineno = 281; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_GOTREF(__pyx_tuple__24);
-  __Pyx_GIVEREF(__pyx_tuple__24);
+  __pyx_tuple__25 = PyTuple_Pack(1, __pyx_kp_s_contiguous_and_direct); if (unlikely(!__pyx_tuple__25)) {__pyx_filename = __pyx_f[2]; __pyx_lineno = 281; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_tuple__25);
+  __Pyx_GIVEREF(__pyx_tuple__25);
 
   /* "View.MemoryView":282
  * 
@@ -16772,9 +17278,9 @@ static int __Pyx_InitCachedConstants(void) {
  * 
  * 
  */
-  __pyx_tuple__25 = PyTuple_Pack(1, __pyx_kp_s_contiguous_and_indirect); if (unlikely(!__pyx_tuple__25)) {__pyx_filename = __pyx_f[2]; __pyx_lineno = 282; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_GOTREF(__pyx_tuple__25);
-  __Pyx_GIVEREF(__pyx_tuple__25);
+  __pyx_tuple__26 = PyTuple_Pack(1, __pyx_kp_s_contiguous_and_indirect); if (unlikely(!__pyx_tuple__26)) {__pyx_filename = __pyx_f[2]; __pyx_lineno = 282; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_tuple__26);
+  __Pyx_GIVEREF(__pyx_tuple__26);
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -16878,22 +17384,26 @@ PyMODINIT_FUNC PyInit_PyClConvolve(void)
   /*--- Variable export code ---*/
   /*--- Function export code ---*/
   /*--- Type init code ---*/
-  if (PyType_Ready(&__pyx_type_12PyClConvolve_NeuralNet) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 6; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyType_Ready(&__pyx_type_12PyClConvolve_NeuralNet) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 12; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_type_12PyClConvolve_NeuralNet.tp_print = 0;
-  if (PyObject_SetAttrString(__pyx_m, "NeuralNet", (PyObject *)&__pyx_type_12PyClConvolve_NeuralNet) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 6; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyObject_SetAttrString(__pyx_m, "NeuralNet", (PyObject *)&__pyx_type_12PyClConvolve_NeuralNet) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 12; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_ptype_12PyClConvolve_NeuralNet = &__pyx_type_12PyClConvolve_NeuralNet;
-  if (PyType_Ready(&__pyx_type_12PyClConvolve_NetdefToNet) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 31; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyType_Ready(&__pyx_type_12PyClConvolve_NetdefToNet) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 39; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_type_12PyClConvolve_NetdefToNet.tp_print = 0;
-  if (PyObject_SetAttrString(__pyx_m, "NetdefToNet", (PyObject *)&__pyx_type_12PyClConvolve_NetdefToNet) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 31; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyObject_SetAttrString(__pyx_m, "NetdefToNet", (PyObject *)&__pyx_type_12PyClConvolve_NetdefToNet) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 39; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_ptype_12PyClConvolve_NetdefToNet = &__pyx_type_12PyClConvolve_NetdefToNet;
-  if (PyType_Ready(&__pyx_type_12PyClConvolve_NetLearner) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 36; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyType_Ready(&__pyx_type_12PyClConvolve_NetLearner) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 44; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_type_12PyClConvolve_NetLearner.tp_print = 0;
-  if (PyObject_SetAttrString(__pyx_m, "NetLearner", (PyObject *)&__pyx_type_12PyClConvolve_NetLearner) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 36; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyObject_SetAttrString(__pyx_m, "NetLearner", (PyObject *)&__pyx_type_12PyClConvolve_NetLearner) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 44; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_ptype_12PyClConvolve_NetLearner = &__pyx_type_12PyClConvolve_NetLearner;
-  if (PyType_Ready(&__pyx_type_12PyClConvolve_GenericLoader) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 53; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyType_Ready(&__pyx_type_12PyClConvolve_GenericLoader) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 61; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_type_12PyClConvolve_GenericLoader.tp_print = 0;
-  if (PyObject_SetAttrString(__pyx_m, "GenericLoader", (PyObject *)&__pyx_type_12PyClConvolve_GenericLoader) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 53; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyObject_SetAttrString(__pyx_m, "GenericLoader", (PyObject *)&__pyx_type_12PyClConvolve_GenericLoader) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 61; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_ptype_12PyClConvolve_GenericLoader = &__pyx_type_12PyClConvolve_GenericLoader;
+  if (PyType_Ready(&__pyx_type_12PyClConvolve_NormalizationLayerMaker) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 97; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_type_12PyClConvolve_NormalizationLayerMaker.tp_print = 0;
+  if (PyObject_SetAttrString(__pyx_m, "NormalizationLayerMaker", (PyObject *)&__pyx_type_12PyClConvolve_NormalizationLayerMaker) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 97; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_ptype_12PyClConvolve_NormalizationLayerMaker = &__pyx_type_12PyClConvolve_NormalizationLayerMaker;
   if (PyType_Ready(&__pyx_type___pyx_array) < 0) {__pyx_filename = __pyx_f[2]; __pyx_lineno = 99; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_type___pyx_array.tp_print = 0;
   __pyx_array_type = &__pyx_type___pyx_array;
@@ -16936,159 +17446,101 @@ PyMODINIT_FUNC PyInit_PyClConvolve(void)
   /*--- Function import code ---*/
   /*--- Execution code ---*/
 
-  /* "PyClConvolve.pyx":3
+  /* "PyClConvolve.pyx":9
  * from cython cimport view
  * from cpython cimport array as c_array
  * from array import array             # <<<<<<<<<<<<<<
  * cimport cClConvolve
  * 
  */
-  __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 3; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 9; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(__pyx_n_s_array);
   PyList_SET_ITEM(__pyx_t_1, 0, __pyx_n_s_array);
   __Pyx_GIVEREF(__pyx_n_s_array);
-  __pyx_t_2 = __Pyx_Import(__pyx_n_s_array, __pyx_t_1, -1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 3; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_Import(__pyx_n_s_array, __pyx_t_1, -1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 9; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_array); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 3; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_array); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 9; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_array, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 3; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_array, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 9; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "PyClConvolve.pyx":33
+  /* "PyClConvolve.pyx":41
  * cdef class NetdefToNet:
  *     @staticmethod
  *     def createNetFromNetdef( NeuralNet neuralnet, netdef ):             # <<<<<<<<<<<<<<
  *         return cClConvolve.NetdefToNet.createNetFromNetdef( neuralnet.thisptr, netdef )
  * 
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_12PyClConvolve_11NetdefToNet_1createNetFromNetdef, NULL, __pyx_n_s_PyClConvolve); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 33; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_12PyClConvolve_11NetdefToNet_1createNetFromNetdef, NULL, __pyx_n_s_PyClConvolve); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 41; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
 
-  /* "PyClConvolve.pyx":32
+  /* "PyClConvolve.pyx":40
  * 
  * cdef class NetdefToNet:
  *     @staticmethod             # <<<<<<<<<<<<<<
  *     def createNetFromNetdef( NeuralNet neuralnet, netdef ):
  *         return cClConvolve.NetdefToNet.createNetFromNetdef( neuralnet.thisptr, netdef )
  */
-  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 32; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 40; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_2);
   __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_staticmethod, __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 32; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_staticmethod, __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 40; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (PyDict_SetItem((PyObject *)__pyx_ptype_12PyClConvolve_NetdefToNet->tp_dict, __pyx_n_s_createNetFromNetdef, __pyx_t_2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 33; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_12PyClConvolve_NetdefToNet->tp_dict, __pyx_n_s_createNetFromNetdef, __pyx_t_2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 41; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   PyType_Modified(__pyx_ptype_12PyClConvolve_NetdefToNet);
 
-  /* "PyClConvolve.pyx":33
+  /* "PyClConvolve.pyx":41
  * cdef class NetdefToNet:
  *     @staticmethod
  *     def createNetFromNetdef( NeuralNet neuralnet, netdef ):             # <<<<<<<<<<<<<<
  *         return cClConvolve.NetdefToNet.createNetFromNetdef( neuralnet.thisptr, netdef )
  * 
  */
-  __pyx_t_2 = __Pyx_GetNameInClass((PyObject *)__pyx_ptype_12PyClConvolve_NetdefToNet, __pyx_n_s_createNetFromNetdef); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 33; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_GetNameInClass((PyObject *)__pyx_ptype_12PyClConvolve_NetdefToNet, __pyx_n_s_createNetFromNetdef); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 41; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
 
-  /* "PyClConvolve.pyx":32
+  /* "PyClConvolve.pyx":40
  * 
  * cdef class NetdefToNet:
  *     @staticmethod             # <<<<<<<<<<<<<<
  *     def createNetFromNetdef( NeuralNet neuralnet, netdef ):
  *         return cClConvolve.NetdefToNet.createNetFromNetdef( neuralnet.thisptr, netdef )
  */
-  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 32; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 40; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_2);
   __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_staticmethod, __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 32; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_staticmethod, __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 40; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (PyDict_SetItem((PyObject *)__pyx_ptype_12PyClConvolve_NetdefToNet->tp_dict, __pyx_n_s_createNetFromNetdef, __pyx_t_2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 33; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_12PyClConvolve_NetdefToNet->tp_dict, __pyx_n_s_createNetFromNetdef, __pyx_t_2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 41; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   PyType_Modified(__pyx_ptype_12PyClConvolve_NetdefToNet);
-
-  /* "PyClConvolve.pyx":55
- * cdef class GenericLoader:
- *     @staticmethod
- *     def getDimensions( trainFilePath ):             # <<<<<<<<<<<<<<
- *         cdef int N
- *         cdef int planes
- */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_12PyClConvolve_13GenericLoader_1getDimensions, NULL, __pyx_n_s_PyClConvolve); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 55; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_GOTREF(__pyx_t_2);
-
-  /* "PyClConvolve.pyx":54
- * 
- * cdef class GenericLoader:
- *     @staticmethod             # <<<<<<<<<<<<<<
- *     def getDimensions( trainFilePath ):
- *         cdef int N
- */
-  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 54; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_GOTREF(__pyx_t_1);
-  PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2);
-  __Pyx_GIVEREF(__pyx_t_2);
-  __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_staticmethod, __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 54; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (PyDict_SetItem((PyObject *)__pyx_ptype_12PyClConvolve_GenericLoader->tp_dict, __pyx_n_s_getDimensions, __pyx_t_2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 55; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  PyType_Modified(__pyx_ptype_12PyClConvolve_GenericLoader);
-
-  /* "PyClConvolve.pyx":55
- * cdef class GenericLoader:
- *     @staticmethod
- *     def getDimensions( trainFilePath ):             # <<<<<<<<<<<<<<
- *         cdef int N
- *         cdef int planes
- */
-  __pyx_t_2 = __Pyx_GetNameInClass((PyObject *)__pyx_ptype_12PyClConvolve_GenericLoader, __pyx_n_s_getDimensions); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 55; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_GOTREF(__pyx_t_2);
-
-  /* "PyClConvolve.pyx":54
- * 
- * cdef class GenericLoader:
- *     @staticmethod             # <<<<<<<<<<<<<<
- *     def getDimensions( trainFilePath ):
- *         cdef int N
- */
-  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 54; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_GOTREF(__pyx_t_1);
-  PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2);
-  __Pyx_GIVEREF(__pyx_t_2);
-  __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_staticmethod, __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 54; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (PyDict_SetItem((PyObject *)__pyx_ptype_12PyClConvolve_GenericLoader->tp_dict, __pyx_n_s_getDimensions, __pyx_t_2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 55; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  PyType_Modified(__pyx_ptype_12PyClConvolve_GenericLoader);
 
   /* "PyClConvolve.pyx":63
- *         return (N,planes,size)
+ * cdef class GenericLoader:
  *     @staticmethod
- *     def loaduc( trainFilepath, unsigned char[:] images, int[:] labels, startN, numExamples ):             # <<<<<<<<<<<<<<
- *         #(N, planes, size) = getDimensions(trainFilepath)
- *         #images = view.array(shape=(N,planes,size,size),itemsize=1,
+ *     def getDimensions( trainFilePath ):             # <<<<<<<<<<<<<<
+ *         cdef int N
+ *         cdef int planes
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_12PyClConvolve_13GenericLoader_3loaduc, NULL, __pyx_n_s_PyClConvolve); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 63; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_12PyClConvolve_13GenericLoader_1getDimensions, NULL, __pyx_n_s_PyClConvolve); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 63; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
 
   /* "PyClConvolve.pyx":62
- *         # print( N )
- *         return (N,planes,size)
+ * 
+ * cdef class GenericLoader:
  *     @staticmethod             # <<<<<<<<<<<<<<
- *     def loaduc( trainFilepath, unsigned char[:] images, int[:] labels, startN, numExamples ):
- *         #(N, planes, size) = getDimensions(trainFilepath)
+ *     def getDimensions( trainFilePath ):
+ *         cdef int N
  */
   __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 62; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
@@ -17098,26 +17550,26 @@ PyMODINIT_FUNC PyInit_PyClConvolve(void)
   __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_staticmethod, __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 62; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (PyDict_SetItem((PyObject *)__pyx_ptype_12PyClConvolve_GenericLoader->tp_dict, __pyx_n_s_loaduc, __pyx_t_2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 63; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_12PyClConvolve_GenericLoader->tp_dict, __pyx_n_s_getDimensions, __pyx_t_2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 63; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   PyType_Modified(__pyx_ptype_12PyClConvolve_GenericLoader);
 
   /* "PyClConvolve.pyx":63
- *         return (N,planes,size)
+ * cdef class GenericLoader:
  *     @staticmethod
- *     def loaduc( trainFilepath, unsigned char[:] images, int[:] labels, startN, numExamples ):             # <<<<<<<<<<<<<<
- *         #(N, planes, size) = getDimensions(trainFilepath)
- *         #images = view.array(shape=(N,planes,size,size),itemsize=1,
+ *     def getDimensions( trainFilePath ):             # <<<<<<<<<<<<<<
+ *         cdef int N
+ *         cdef int planes
  */
-  __pyx_t_2 = __Pyx_GetNameInClass((PyObject *)__pyx_ptype_12PyClConvolve_GenericLoader, __pyx_n_s_loaduc); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 63; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_GetNameInClass((PyObject *)__pyx_ptype_12PyClConvolve_GenericLoader, __pyx_n_s_getDimensions); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 63; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
 
   /* "PyClConvolve.pyx":62
- *         # print( N )
- *         return (N,planes,size)
+ * 
+ * cdef class GenericLoader:
  *     @staticmethod             # <<<<<<<<<<<<<<
- *     def loaduc( trainFilepath, unsigned char[:] images, int[:] labels, startN, numExamples ):
- *         #(N, planes, size) = getDimensions(trainFilepath)
+ *     def getDimensions( trainFilePath ):
+ *         cdef int N
  */
   __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 62; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
@@ -17127,26 +17579,26 @@ PyMODINIT_FUNC PyInit_PyClConvolve(void)
   __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_staticmethod, __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 62; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (PyDict_SetItem((PyObject *)__pyx_ptype_12PyClConvolve_GenericLoader->tp_dict, __pyx_n_s_loaduc, __pyx_t_2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 63; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_12PyClConvolve_GenericLoader->tp_dict, __pyx_n_s_getDimensions, __pyx_t_2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 63; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   PyType_Modified(__pyx_ptype_12PyClConvolve_GenericLoader);
 
   /* "PyClConvolve.pyx":71
- *         #return (images, labels)
+ *         return (N,planes,size)
  *     @staticmethod
- *     def load( trainFilepath, float[:] images, int[:] labels, startN, numExamples ):             # <<<<<<<<<<<<<<
- *         (N, planes, size) = GenericLoader.getDimensions(trainFilepath)
+ *     def loaduc( trainFilepath, unsigned char[:] images, int[:] labels, startN, numExamples ):             # <<<<<<<<<<<<<<
+ *         #(N, planes, size) = getDimensions(trainFilepath)
  *         #images = view.array(shape=(N,planes,size,size),itemsize=1,
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_12PyClConvolve_13GenericLoader_5load, NULL, __pyx_n_s_PyClConvolve); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 71; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_12PyClConvolve_13GenericLoader_3loaduc, NULL, __pyx_n_s_PyClConvolve); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 71; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
 
   /* "PyClConvolve.pyx":70
- *         cClConvolve.GenericLoader.load( trainFilepath, &images[0], &labels[0], startN , numExamples )
- *         #return (images, labels)
+ *         # print( N )
+ *         return (N,planes,size)
  *     @staticmethod             # <<<<<<<<<<<<<<
- *     def load( trainFilepath, float[:] images, int[:] labels, startN, numExamples ):
- *         (N, planes, size) = GenericLoader.getDimensions(trainFilepath)
+ *     def loaduc( trainFilepath, unsigned char[:] images, int[:] labels, startN, numExamples ):
+ *         #(N, planes, size) = getDimensions(trainFilepath)
  */
   __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 70; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
@@ -17156,26 +17608,26 @@ PyMODINIT_FUNC PyInit_PyClConvolve(void)
   __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_staticmethod, __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 70; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (PyDict_SetItem((PyObject *)__pyx_ptype_12PyClConvolve_GenericLoader->tp_dict, __pyx_n_s_load, __pyx_t_2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 71; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_12PyClConvolve_GenericLoader->tp_dict, __pyx_n_s_loaduc, __pyx_t_2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 71; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   PyType_Modified(__pyx_ptype_12PyClConvolve_GenericLoader);
 
   /* "PyClConvolve.pyx":71
- *         #return (images, labels)
+ *         return (N,planes,size)
  *     @staticmethod
- *     def load( trainFilepath, float[:] images, int[:] labels, startN, numExamples ):             # <<<<<<<<<<<<<<
- *         (N, planes, size) = GenericLoader.getDimensions(trainFilepath)
+ *     def loaduc( trainFilepath, unsigned char[:] images, int[:] labels, startN, numExamples ):             # <<<<<<<<<<<<<<
+ *         #(N, planes, size) = getDimensions(trainFilepath)
  *         #images = view.array(shape=(N,planes,size,size),itemsize=1,
  */
-  __pyx_t_2 = __Pyx_GetNameInClass((PyObject *)__pyx_ptype_12PyClConvolve_GenericLoader, __pyx_n_s_load); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 71; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_GetNameInClass((PyObject *)__pyx_ptype_12PyClConvolve_GenericLoader, __pyx_n_s_loaduc); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 71; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
 
   /* "PyClConvolve.pyx":70
- *         cClConvolve.GenericLoader.load( trainFilepath, &images[0], &labels[0], startN , numExamples )
- *         #return (images, labels)
+ *         # print( N )
+ *         return (N,planes,size)
  *     @staticmethod             # <<<<<<<<<<<<<<
- *     def load( trainFilepath, float[:] images, int[:] labels, startN, numExamples ):
- *         (N, planes, size) = GenericLoader.getDimensions(trainFilepath)
+ *     def loaduc( trainFilepath, unsigned char[:] images, int[:] labels, startN, numExamples ):
+ *         #(N, planes, size) = getDimensions(trainFilepath)
  */
   __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 70; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
@@ -17185,14 +17637,130 @@ PyMODINIT_FUNC PyInit_PyClConvolve(void)
   __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_staticmethod, __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 70; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (PyDict_SetItem((PyObject *)__pyx_ptype_12PyClConvolve_GenericLoader->tp_dict, __pyx_n_s_load, __pyx_t_2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 71; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_12PyClConvolve_GenericLoader->tp_dict, __pyx_n_s_loaduc, __pyx_t_2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 71; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   PyType_Modified(__pyx_ptype_12PyClConvolve_GenericLoader);
+
+  /* "PyClConvolve.pyx":79
+ *         #return (images, labels)
+ *     @staticmethod
+ *     def load( trainFilepath, float[:] images, int[:] labels, startN, numExamples ):             # <<<<<<<<<<<<<<
+ *         (N, planes, size) = GenericLoader.getDimensions(trainFilepath)
+ *         #images = view.array(shape=(N,planes,size,size),itemsize=1,
+ */
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_12PyClConvolve_13GenericLoader_5load, NULL, __pyx_n_s_PyClConvolve); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 79; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_2);
+
+  /* "PyClConvolve.pyx":78
+ *         cClConvolve.GenericLoader.load( trainFilepath, &images[0], &labels[0], startN , numExamples )
+ *         #return (images, labels)
+ *     @staticmethod             # <<<<<<<<<<<<<<
+ *     def load( trainFilepath, float[:] images, int[:] labels, startN, numExamples ):
+ *         (N, planes, size) = GenericLoader.getDimensions(trainFilepath)
+ */
+  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 78; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_1);
+  PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2);
+  __Pyx_GIVEREF(__pyx_t_2);
+  __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_staticmethod, __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 78; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_12PyClConvolve_GenericLoader->tp_dict, __pyx_n_s_load, __pyx_t_2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 79; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  PyType_Modified(__pyx_ptype_12PyClConvolve_GenericLoader);
+
+  /* "PyClConvolve.pyx":79
+ *         #return (images, labels)
+ *     @staticmethod
+ *     def load( trainFilepath, float[:] images, int[:] labels, startN, numExamples ):             # <<<<<<<<<<<<<<
+ *         (N, planes, size) = GenericLoader.getDimensions(trainFilepath)
+ *         #images = view.array(shape=(N,planes,size,size),itemsize=1,
+ */
+  __pyx_t_2 = __Pyx_GetNameInClass((PyObject *)__pyx_ptype_12PyClConvolve_GenericLoader, __pyx_n_s_load); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 79; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_2);
+
+  /* "PyClConvolve.pyx":78
+ *         cClConvolve.GenericLoader.load( trainFilepath, &images[0], &labels[0], startN , numExamples )
+ *         #return (images, labels)
+ *     @staticmethod             # <<<<<<<<<<<<<<
+ *     def load( trainFilepath, float[:] images, int[:] labels, startN, numExamples ):
+ *         (N, planes, size) = GenericLoader.getDimensions(trainFilepath)
+ */
+  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 78; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_1);
+  PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2);
+  __Pyx_GIVEREF(__pyx_t_2);
+  __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_staticmethod, __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 78; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_12PyClConvolve_GenericLoader->tp_dict, __pyx_n_s_load, __pyx_t_2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 79; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  PyType_Modified(__pyx_ptype_12PyClConvolve_GenericLoader);
+
+  /* "PyClConvolve.pyx":108
+ *         return self
+ *     @staticmethod
+ *     def instance():             # <<<<<<<<<<<<<<
+ *         return NormalizationLayerMaker()
+ * 
+ */
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_12PyClConvolve_23NormalizationLayerMaker_7instance, NULL, __pyx_n_s_PyClConvolve); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 108; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_2);
+
+  /* "PyClConvolve.pyx":107
+ *         self.thisptr.scale( _scale )
+ *         return self
+ *     @staticmethod             # <<<<<<<<<<<<<<
+ *     def instance():
+ *         return NormalizationLayerMaker()
+ */
+  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 107; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_1);
+  PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2);
+  __Pyx_GIVEREF(__pyx_t_2);
+  __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_staticmethod, __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 107; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_12PyClConvolve_NormalizationLayerMaker->tp_dict, __pyx_n_s_instance, __pyx_t_2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 108; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  PyType_Modified(__pyx_ptype_12PyClConvolve_NormalizationLayerMaker);
+
+  /* "PyClConvolve.pyx":108
+ *         return self
+ *     @staticmethod
+ *     def instance():             # <<<<<<<<<<<<<<
+ *         return NormalizationLayerMaker()
+ * 
+ */
+  __pyx_t_2 = __Pyx_GetNameInClass((PyObject *)__pyx_ptype_12PyClConvolve_NormalizationLayerMaker, __pyx_n_s_instance); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 108; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_2);
+
+  /* "PyClConvolve.pyx":107
+ *         self.thisptr.scale( _scale )
+ *         return self
+ *     @staticmethod             # <<<<<<<<<<<<<<
+ *     def instance():
+ *         return NormalizationLayerMaker()
+ */
+  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 107; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_1);
+  PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2);
+  __Pyx_GIVEREF(__pyx_t_2);
+  __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_staticmethod, __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 107; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_12PyClConvolve_NormalizationLayerMaker->tp_dict, __pyx_n_s_instance, __pyx_t_2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 108; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  PyType_Modified(__pyx_ptype_12PyClConvolve_NormalizationLayerMaker);
 
   /* "PyClConvolve.pyx":1
- * from cython cimport view             # <<<<<<<<<<<<<<
- * from cpython cimport array as c_array
- * from array import array
+ * # Copyright Hugh Perkins 2015             # <<<<<<<<<<<<<<
+ * #
+ * # This Source Code Form is subject to the terms of the Mozilla Public License,
  */
   __pyx_t_2 = PyDict_New(); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 1; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
@@ -17219,7 +17787,7 @@ PyMODINIT_FUNC PyInit_PyClConvolve(void)
  * cdef strided = Enum("<strided and direct>") # default
  * cdef indirect = Enum("<strided and indirect>")
  */
-  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)((PyObject *)__pyx_MemviewEnum_type)), __pyx_tuple__21, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[2]; __pyx_lineno = 276; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)((PyObject *)__pyx_MemviewEnum_type)), __pyx_tuple__22, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[2]; __pyx_lineno = 276; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_XGOTREF(generic);
   __Pyx_DECREF_SET(generic, __pyx_t_2);
@@ -17233,7 +17801,7 @@ PyMODINIT_FUNC PyInit_PyClConvolve(void)
  * cdef indirect = Enum("<strided and indirect>")
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)((PyObject *)__pyx_MemviewEnum_type)), __pyx_tuple__22, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[2]; __pyx_lineno = 277; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)((PyObject *)__pyx_MemviewEnum_type)), __pyx_tuple__23, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[2]; __pyx_lineno = 277; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_XGOTREF(strided);
   __Pyx_DECREF_SET(strided, __pyx_t_2);
@@ -17247,7 +17815,7 @@ PyMODINIT_FUNC PyInit_PyClConvolve(void)
  * 
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)((PyObject *)__pyx_MemviewEnum_type)), __pyx_tuple__23, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[2]; __pyx_lineno = 278; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)((PyObject *)__pyx_MemviewEnum_type)), __pyx_tuple__24, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[2]; __pyx_lineno = 278; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_XGOTREF(indirect);
   __Pyx_DECREF_SET(indirect, __pyx_t_2);
@@ -17261,7 +17829,7 @@ PyMODINIT_FUNC PyInit_PyClConvolve(void)
  * cdef indirect_contiguous = Enum("<contiguous and indirect>")
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)((PyObject *)__pyx_MemviewEnum_type)), __pyx_tuple__24, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[2]; __pyx_lineno = 281; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)((PyObject *)__pyx_MemviewEnum_type)), __pyx_tuple__25, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[2]; __pyx_lineno = 281; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_XGOTREF(contiguous);
   __Pyx_DECREF_SET(contiguous, __pyx_t_2);
@@ -17275,7 +17843,7 @@ PyMODINIT_FUNC PyInit_PyClConvolve(void)
  * 
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)((PyObject *)__pyx_MemviewEnum_type)), __pyx_tuple__25, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[2]; __pyx_lineno = 282; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)((PyObject *)__pyx_MemviewEnum_type)), __pyx_tuple__26, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[2]; __pyx_lineno = 282; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_XGOTREF(indirect_contiguous);
   __Pyx_DECREF_SET(indirect_contiguous, __pyx_t_2);
@@ -18373,6 +18941,45 @@ static CYTHON_INLINE int __Pyx_TypeTest(PyObject *obj, PyTypeObject *type) {
         return 1;
     PyErr_Format(PyExc_TypeError, "Cannot convert %.200s to %.200s",
                  Py_TYPE(obj)->tp_name, type->tp_name);
+    return 0;
+}
+
+static CYTHON_INLINE int __Pyx_CheckKeywordStrings(
+    PyObject *kwdict,
+    const char* function_name,
+    int kw_allowed)
+{
+    PyObject* key = 0;
+    Py_ssize_t pos = 0;
+#if CYTHON_COMPILING_IN_PYPY
+    if (!kw_allowed && PyDict_Next(kwdict, &pos, &key, 0))
+        goto invalid_keyword;
+    return 1;
+#else
+    while (PyDict_Next(kwdict, &pos, &key, 0)) {
+        #if PY_MAJOR_VERSION < 3
+        if (unlikely(!PyString_CheckExact(key)) && unlikely(!PyString_Check(key)))
+        #endif
+            if (unlikely(!PyUnicode_Check(key)))
+                goto invalid_keyword_type;
+    }
+    if ((!kw_allowed) && unlikely(key))
+        goto invalid_keyword;
+    return 1;
+invalid_keyword_type:
+    PyErr_Format(PyExc_TypeError,
+        "%.200s() keywords must be strings", function_name);
+    return 0;
+#endif
+invalid_keyword:
+    PyErr_Format(PyExc_TypeError,
+    #if PY_MAJOR_VERSION < 3
+        "%.200s() got an unexpected keyword argument '%.200s'",
+        function_name, PyString_AsString(key));
+    #else
+        "%s() got an unexpected keyword argument '%U'",
+        function_name, key);
+    #endif
     return 0;
 }
 
