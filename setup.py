@@ -78,6 +78,7 @@ ext_modules = [
         'OpenCLHelper/deviceinfo_helper.cpp', 'OpenCLHelper/platforminfo_helper.cpp',
         'OpenCLHelper/CLKernel.cpp', 'OpenCLHelper/thirdparty/clew/src/clew.c' ] ),
         include_dirs = ['ClConvolve/OpenCLHelper'],
+        extra_compile_args=['-std=c++11'],
         libraries = [],
 #        language='c++'
     ),
