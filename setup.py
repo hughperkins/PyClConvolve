@@ -6,13 +6,17 @@ import sys
 from setuptools import setup
 #from distutils.extension import Extension
 from setuptools import Extension
-from Cython.Build import cythonize
+try:
+    from Cython.Build import cythonize
+    cython_present = True
+except ImportError:
+    pass
 
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 def my_cythonize(extensions, **_ignore):
-    newextensions = []
+    #newextensions = []
     for extension in extensions:
         print(extension.sources)
         should_cythonize = False
@@ -28,14 +32,11 @@ def my_cythonize(extensions, **_ignore):
                 sfile = path + ext
             sources.append(sfile)
         print(should_cythonize)
-        if should_cythonize:
+        if should_cythonize and cython_present:
             cythonize(extension)
         extension.sources[:] = sources    
-        if should_cythonize:
-            newextensions.append( extension )
-        else:
-            newextensions.append( extension )
-    return newextensions
+        #newextensions.append( extension )
+    return extensions
 
 # from http://stackoverflow.com/questions/14320220/testing-python-c-libraries-get-build-path
 def distutils_dir_name(dname):
