@@ -4,8 +4,14 @@ from __future__ import print_function
 import array
 import PyClConvolve
 
+print('imports done')
+
 net = PyClConvolve.NeuralNet(1,28)
+print('created net')
+print( net.asString() )
+print('printed net')
 net.addLayer( PyClConvolve.NormalizationLayerMaker().translate(-0.5).scale(1/255.0) )
+print('added layer ')
 PyClConvolve.NetdefToNet.createNetFromNetdef( net, "rt2-8c5-mp2-16c5-mp3-150n-10n" ) 
 print( net.asString() )
  

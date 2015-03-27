@@ -12,11 +12,12 @@ cimport cClConvolve
 cdef class NeuralNet:
     cdef cClConvolve.NeuralNet *thisptr
 
-    def __cinit__(self, planes, size):
-        self.thisptr = new cClConvolve.NeuralNet(planes, size)
-
-    def __cinit__(self):
-        self.thisptr = new cClConvolve.NeuralNet()
+    def __cinit__(self, planes = None, size = None):
+        print( '__cinit__(planes,size)')
+        if planes == None and size == None:
+             self.thisptr = new cClConvolve.NeuralNet()
+        else:
+            self.thisptr = new cClConvolve.NeuralNet(planes, size)
 
     def asString(self):
         return self.thisptr.asString()
