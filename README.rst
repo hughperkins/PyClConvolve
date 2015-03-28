@@ -6,13 +6,17 @@ Python wrapper for ClConvolve
 How to use
 ==========
 
-See `test\_clconvolve.py <test_clconvolve.py>`__ for an example of: \*
-creating a network, with several layers \* loading mnist data \*
-training the network using a higher-level interface (``NetLearner``)
+See `test\_clconvolve.py <test_clconvolve.py>`__ for an example of:
+
+-  creating a network, with several layers
+-  loading mnist data
+-  training the network using a higher-level interface (``NetLearner``)
 
 For examples of using lower-level entrypoints, see
-`test\_lowlevel.py <test_lowlevel.py>`__: \* creating layers directly \*
-running epochs and forward/backprop directly
+`test\_lowlevel.py <test_lowlevel.py>`__:
+
+-  creating layers directly
+-  running epochs and forward/backprop directly
 
 Notes on how the wrapper works
 ==============================
@@ -28,11 +32,13 @@ To build
 ========
 
 Should probably more or less build on Windows too, but here are
-instructions for linux for now: \* checkout:
+instructions for linux for now:
 
-::
+-  checkout:
 
-    git clone --recursive https://github.com/hughperkins/PyClConvolve.git
+   ::
+
+       git clone --recursive https://github.com/hughperkins/PyClConvolve.git
 
 -  build the C++ library:
 

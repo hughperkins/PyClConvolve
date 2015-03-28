@@ -128,7 +128,7 @@ ext_modules = [
 
 setup(
   name = 'PyClConvolve',
-  version = "0.0.2",
+  version = "0.0.3",
   author = "Hugh Perkins",
   author_email = "hughperkins@gmail.com",
   description = 'python wrapper for ClConvolve deep convolutional neural network library for OpenCL',
