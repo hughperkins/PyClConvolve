@@ -12,12 +12,12 @@ cdef extern from "NeuralNet.h":
         #pass
         NeuralNet()
         #void print()
-        NeuralNet( int numPlanes, int size )
-        string asString()
-        void setBatchSize( int batchSize )
-        void propagate( const float *images)
-        void backPropFromLabels( float learningRate, const int *labels)
-        void backProp( float learningRate, const float *expectedResults)
+        NeuralNet( int numPlanes, int size ) except +
+        string asString() except +
+        void setBatchSize( int batchSize ) except +
+        void propagate( const float *images) except +
+        void backPropFromLabels( float learningRate, const int *labels) except +
+        void backProp( float learningRate, const float *expectedResults) except +
         int calcNumRight( const int *labels )
         void addLayer( LayerMaker2 *maker )
 
@@ -34,7 +34,7 @@ cdef extern from "NetLearner.h":
         void setSchedule( int numEpochs )
         void setDumpTimings( bool dumpTimings )
         void setBatchSize( int batchSize )
-        void learn( float learningRate )
+        void learn( float learningRate ) except +
         #void setSchedule( int numEpochs, int startEpoch )
         # VIRTUAL void addPostEpochAction( PostEpochAction *action );
         #void learn( float learningRate, float annealLearningRate )
@@ -42,9 +42,9 @@ cdef extern from "NetLearner.h":
 cdef extern from "GenericLoader.h":
     cdef cppclass GenericLoader:
         @staticmethod
-        void getDimensions( string trainFilepath, int *p_numExamples, int *p_numPlanes, int *p_imageSize )
+        void getDimensions( string trainFilepath, int *p_numExamples, int *p_numPlanes, int *p_imageSize ) except +
         @staticmethod
-        void load( string trainFilepath, unsigned char *images, int *labels, int startN, int numExamples )
+        void load( string trainFilepath, unsigned char *images, int *labels, int startN, int numExamples ) except +
 
 cdef extern from "LayerMaker.h":
     cdef cppclass LayerMaker2:

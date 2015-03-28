@@ -62,9 +62,25 @@ def my_cythonize(extensions, **_ignore):
             sources.append(sfile)
         print(should_cythonize)
         if should_cythonize and cython_present:
+            print('cythonizing...')
             cythonize(extension)
         extension.sources[:] = sources    
         #newextensions.append( extension )
+    return extensions
+
+def no_cythonize(extensions, **_ignore):
+    for extension in extensions:
+        sources = []
+        for sfile in extension.sources:
+            path, ext = os.path.splitext(sfile)
+            if ext in ('.pyx', '.py'):
+                if extension.language == 'c++':
+                    ext = '.cpp'
+                else:
+                    ext = '.c'
+                sfile = path + ext
+            sources.append(sfile)
+        extension.sources[:] = sources    
     return extensions
 
 # from http://stackoverflow.com/questions/14320220/testing-python-c-libraries-get-build-path
@@ -125,34 +141,54 @@ runtime_library_dirs = []
 if osfamily == 'Linux':
     runtime_library_dirs= ['.']
 
+if cython_present:
+    my_cythonize = cythonize
+else:
+    my_cythonize = no_cythonize
+
+#libraries = [
+#    ("OpenCLHelper", {
+#        'sources': openclhelpersources + ['dummy_openclhelper.cpp'],
+#        'include_dirs': ['ClConvolve/OpenCLHelper'],
+#        'extra_compile_args': compile_options,
+##        define_macros = [('OpenCLHelper_EXPORTS',1)],
+##        libraries = []
+##        language='c++'
+#        }
+#    )
+#]
+
 ext_modules = [
-    Extension("libOpenCLHelper",
-        sources = openclhelpersources,
-        include_dirs = ['ClConvolve/OpenCLHelper'],
-        extra_compile_args=compile_options,
-        define_macros = [('OpenCLHelper_EXPORTS',1)],
-#        libraries = []
-#        language='c++'
-    ),
-    Extension("libClConvolve",
-        list(map( lambda name : 'ClConvolve/src/' + name, clconvolve_sources)), # +
-#            glob.glob('ClConvolve/src/*.h'),
-        include_dirs = ['ClConvolve/src','ClConvolve/OpenCLHelper'],
-        extra_compile_args = compile_options,
-        library_dirs = [ lib_build_dir() ],
-        libraries = [ "OpenCLHelper" + get_so_suffix() ],
-        define_macros = [('ClConvolve_EXPORTS',1)],
-        runtime_library_dirs=runtime_library_dirs
-#        language='c++'
-    ),
+#    Extension("_OpenCLHelper",
+#        sources = openclhelpersources + ['dummy_openclhelper.cpp'],
+#        include_dirs = ['ClConvolve/OpenCLHelper'],
+#        extra_compile_args=compile_options,
+#        define_macros = [('OpenCLHelper_EXPORTS',1),('MS_WIN32',1)],
+##        libraries = []
+##        language='c++'
+#    )
+#    Extension("libClConvolve",
+#        list(map( lambda name : 'ClConvolve/src/' + name, clconvolve_sources)), # +
+##            glob.glob('ClConvolve/src/*.h'),
+#        include_dirs = ['ClConvolve/src','ClConvolve/OpenCLHelper'],
+#        extra_compile_args = compile_options,
+#        library_dirs = [ lib_build_dir() ],
+#        libraries = [ "OpenCLHelper" + get_so_suffix() ],
+#        define_macros = [('ClConvolve_EXPORTS',1)],
+#        runtime_library_dirs=runtime_library_dirs
+##        language='c++'
+#    ),
     Extension("PyClConvolve",
-              sources=["PyClConvolve.pyx"], # + 
+              sources=["PyClConvolve.pyx"] 
+                + openclhelpersources
+                + list(map( lambda name : 'ClConvolve/src/' + name, clconvolve_sources)), 
 #                glob.glob('ClConvolve/OpenCLHelper/*.h'),
               include_dirs = ['ClConvolve/src','ClConvolve/OpenCLHelper'],
-              libraries=["ClConvolve" + get_so_suffix() ],
+#              libraries=["ClConvolve" + get_so_suffix() ],
               extra_compile_args=compile_options,
+        define_macros = [('ClConvolve_EXPORTS',1),('OpenCLHelper_EXPORTS',1)],
 #              extra_objects=['cClConvolve.pxd'],
-              library_dirs = [lib_build_dir()],
+#              library_dirs = [lib_build_dir()],
               runtime_library_dirs=runtime_library_dirs,
               language="c++"
     )
@@ -176,6 +212,7 @@ setup(
   tests_require = ['nose>=1.3.4'],
   scripts = ['test_clconvolve.py','test_lowlevel.py'],
  # modules = libraries,
+#  libraries = libraries,
   ext_modules = my_cythonize( ext_modules),
 )
 
