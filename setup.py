@@ -11,9 +11,31 @@ try:
     cython_present = True
 except ImportError:
     pass
+try:
+    import pypandoc
+    pypandoc_present = True
+except ImportError:
+    pass
+
+print ( sys.argv )
 
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
+
+def get_so_suffix():
+    if sysconfig.get_config_var('SOABI') != None:
+        return "." + sysconfig.get_config_var('SOABI')
+    return ""
+
+def read_md( mdname ): 
+    if pypandoc_present:
+        return pypandoc.convert(mdname, 'rst')
+    else:
+        print("warning: pypandoc module not found, could not convert Markdown to RST")
+        return open(mdname, 'r').read()
+
+if pypandoc_present:
+    pypandoc.convert('README.md', 'rst', outputfile = 'README.rst' )
 
 def my_cythonize(extensions, **_ignore):
     #newextensions = []
@@ -72,28 +94,32 @@ clconvolve_sources = []
 for source in clconvolve_sources_all:
     clconvolve_sources.append(source)
 
+openclhelpersources = list(map( lambda name : 'ClConvolve/' + name, [ 'OpenCLHelper/OpenCLHelper.cpp',
+        'OpenCLHelper/deviceinfo_helper.cpp', 'OpenCLHelper/platforminfo_helper.cpp',
+        'OpenCLHelper/CLKernel.cpp', 'OpenCLHelper/thirdparty/clew/src/clew.c' ] ))
+print(openclhelpersources)
+print(isinstance( openclhelpersources, list) )
+
 ext_modules = [
     Extension("libOpenCLHelper",
-        map( lambda name : 'ClConvolve/' + name, [ 'OpenCLHelper/OpenCLHelper.cpp',
-        'OpenCLHelper/deviceinfo_helper.cpp', 'OpenCLHelper/platforminfo_helper.cpp',
-        'OpenCLHelper/CLKernel.cpp', 'OpenCLHelper/thirdparty/clew/src/clew.c' ] ),
+        sources = openclhelpersources,
         include_dirs = ['ClConvolve/OpenCLHelper'],
-        extra_compile_args=['-std=c++11'],
-        libraries = [],
+        extra_compile_args=['-std=c++11']
+#        libraries = []
 #        language='c++'
     ),
     Extension("libClConvolve",
-        map( lambda name : 'ClConvolve/src/' + name, clconvolve_sources ),
+        list(map( lambda name : 'ClConvolve/src/' + name, clconvolve_sources )),
         include_dirs = ['ClConvolve/src','ClConvolve/OpenCLHelper'],
         extra_compile_args = ['-std=c++11'],
         library_dirs = [ lib_build_dir() ],
-        libraries = [ 'OpenCLHelper'],
+        libraries = [ "OpenCLHelper" + get_so_suffix() ],
 #        language='c++'
     ),
     Extension("PyClConvolve",
               sources=["PyClConvolve.pyx"],
               include_dirs = ['ClConvolve/src','ClConvolve/OpenCLHelper'],
-              libraries=["ClConvolve"],
+              libraries=["ClConvolve" + get_so_suffix() ],
               extra_compile_args=['-std=c++11'],
               library_dirs = [lib_build_dir()],
               language="c++"
@@ -102,13 +128,13 @@ ext_modules = [
 
 setup(
   name = 'PyClConvolve',
-  version = "0.0.1",
+  version = "0.0.2",
   author = "Hugh Perkins",
   author_email = "hughperkins@gmail.com",
   description = 'python wrapper for ClConvolve deep convolutional neural network library for OpenCL',
   license = 'MPL',
   url = 'https://github.com/hughperkins/PyClConvolve',
-  long_description = read('README.md'),
+  long_description = read_md('README.md'),
   classifiers = [
     'Development Status :: 4 - Beta',
     'Topic :: Scientific/Engineering :: Artificial Intelligence',

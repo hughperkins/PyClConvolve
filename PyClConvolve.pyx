@@ -9,6 +9,11 @@ from cpython cimport array as c_array
 from array import array
 cimport cClConvolve
 
+def toCppString( pyString ):
+    if isinstance( pyString, unicode ):
+        return pyString.encode('utf8')
+    return pyString
+
 cdef class NeuralNet:
     cdef cClConvolve.NeuralNet *thisptr
 
@@ -43,7 +48,7 @@ cdef class NeuralNet:
 cdef class NetdefToNet:
     @staticmethod
     def createNetFromNetdef( NeuralNet neuralnet, netdef ):
-        return cClConvolve.NetdefToNet.createNetFromNetdef( neuralnet.thisptr, netdef )
+        return cClConvolve.NetdefToNet.createNetFromNetdef( neuralnet.thisptr, toCppString( netdef ) )
 
 cdef class NetLearner: 
     cdef cClConvolve.NetLearner[float] *thisptr
@@ -68,7 +73,7 @@ cdef class GenericLoader:
         cdef int N
         cdef int planes
         cdef int size
-        cClConvolve.GenericLoader.getDimensions( trainFilePath, &N, &planes, &size )
+        cClConvolve.GenericLoader.getDimensions( toCppString( trainFilePath ), &N, &planes, &size )
         # print( N )
         return (N,planes,size)
     @staticmethod 
@@ -77,11 +82,11 @@ cdef class GenericLoader:
         #images = view.array(shape=(N,planes,size,size),itemsize=1,
         #cdef unsigned char *images
         #cdef int *labels
-        cClConvolve.GenericLoader.load( trainFilepath, &images[0], &labels[0], startN , numExamples )
+        cClConvolve.GenericLoader.load( toCppString( trainFilepath ), &images[0], &labels[0], startN , numExamples )
         #return (images, labels)
     @staticmethod 
     def load( trainFilepath, float[:] images, int[:] labels, startN, numExamples ):
-        (N, planes, size) = GenericLoader.getDimensions(trainFilepath)
+        (N, planes, size) = GenericLoader.getDimensions(toCppString(trainFilepath))
         #images = view.array(shape=(N,planes,size,size),itemsize=1,
         #cdef unsigned char *images
         #cdef int *labels
@@ -89,7 +94,7 @@ cdef class GenericLoader:
         print( (N, planes, size ) )
         cdef c_array.array ucImages = array('B', [0] * (numExamples * planes * size * size) )
         cdef unsigned char[:] ucImagesMv = ucImages
-        cClConvolve.GenericLoader.load( trainFilepath, &ucImagesMv[0], &labels[0], startN , numExamples )
+        cClConvolve.GenericLoader.load( toCppString(trainFilepath), &ucImagesMv[0], &labels[0], startN , numExamples )
         #return (images, labels)
         cdef int i
         cdef int total
