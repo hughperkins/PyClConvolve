@@ -10,7 +10,7 @@ from libcpp cimport bool
 cdef extern from "NeuralNet.h":
     cdef cppclass NeuralNet:
         #pass
-        NeuralNet()
+        NeuralNet() except +
         #void print()
         NeuralNet( int numPlanes, int size ) except +
         string asString() except +
@@ -18,22 +18,22 @@ cdef extern from "NeuralNet.h":
         void propagate( const float *images) except +
         void backPropFromLabels( float learningRate, const int *labels) except +
         void backProp( float learningRate, const float *expectedResults) except +
-        int calcNumRight( const int *labels )
-        void addLayer( LayerMaker2 *maker )
+        int calcNumRight( const int *labels ) except +
+        void addLayer( LayerMaker2 *maker ) except +
 
 cdef extern from "NetdefToNet.h":
     cdef cppclass NetdefToNet:
         @staticmethod
-        bool createNetFromNetdef( NeuralNet *net, string netdef )
+        bool createNetFromNetdef( NeuralNet *net, string netdef ) except +
 
 cdef extern from "NetLearner.h":
     cdef cppclass NetLearner[T]:
-        NetLearner( NeuralNet *net )
-        void setTrainingData( int Ntrain, T *trainData, int *trainLabels )
-        void setTestingData( int Ntest, T *testData, int *testLabels )
-        void setSchedule( int numEpochs )
-        void setDumpTimings( bool dumpTimings )
-        void setBatchSize( int batchSize )
+        NetLearner( NeuralNet *net ) except +
+        void setTrainingData( int Ntrain, T *trainData, int *trainLabels ) except +
+        void setTestingData( int Ntest, T *testData, int *testLabels ) except +
+        void setSchedule( int numEpochs ) except +
+        void setDumpTimings( bool dumpTimings ) except +
+        void setBatchSize( int batchSize ) except +
         void learn( float learningRate ) except +
         #void setSchedule( int numEpochs, int startEpoch )
         # VIRTUAL void addPostEpochAction( PostEpochAction *action );
@@ -52,50 +52,50 @@ cdef extern from "LayerMaker.h":
 
 cdef extern from "NormalizationLayerMaker.h":
     cdef cppclass NormalizationLayerMaker(LayerMaker2):
-        NormalizationLayerMaker *translate( float translate )
-        NormalizationLayerMaker *scale( float scale )
+        NormalizationLayerMaker *translate( float translate ) except +
+        NormalizationLayerMaker *scale( float scale ) except +
         @staticmethod
-        NormalizationLayerMaker *instance()
+        NormalizationLayerMaker *instance() except +
 
 cdef extern from "FullyConnectedMaker.h":
     cdef cppclass FullyConnectedMaker(LayerMaker2):
-        FullyConnectedMaker *numPlanes( int numPlanes )
-        FullyConnectedMaker *imageSize( int imageSize )
-        FullyConnectedMaker *biased()
-        FullyConnectedMaker *biased(bint _biased)
-        FullyConnectedMaker *linear()
-        FullyConnectedMaker *tanh()
-        FullyConnectedMaker *sigmoid()
-        FullyConnectedMaker *relu()
+        FullyConnectedMaker *numPlanes( int numPlanes ) except +
+        FullyConnectedMaker *imageSize( int imageSize ) except +
+        FullyConnectedMaker *biased() except +
+        FullyConnectedMaker *biased(bint _biased) except +
+        FullyConnectedMaker *linear() except +
+        FullyConnectedMaker *tanh() except +
+        FullyConnectedMaker *sigmoid() except +
+        FullyConnectedMaker *relu() except +
         @staticmethod
-        FullyConnectedMaker *instance()
+        FullyConnectedMaker *instance() except +
 
 cdef extern from "ConvolutionalMaker.h":
     cdef cppclass ConvolutionalMaker(LayerMaker2):
-        ConvolutionalMaker *numFilters( int numFilters )
-        ConvolutionalMaker *filterSize( int imageSize )
-        ConvolutionalMaker *padZeros()
-        ConvolutionalMaker *padZeros(bint _padZeros)
-        ConvolutionalMaker *biased()
-        ConvolutionalMaker *biased(bint _biased)
-        ConvolutionalMaker *linear()
-        ConvolutionalMaker *tanh()
-        ConvolutionalMaker *sigmoid()
-        ConvolutionalMaker *relu()
+        ConvolutionalMaker *numFilters( int numFilters ) except +
+        ConvolutionalMaker *filterSize( int imageSize ) except +
+        ConvolutionalMaker *padZeros() except +
+        ConvolutionalMaker *padZeros(bint _padZeros) except +
+        ConvolutionalMaker *biased() except +
+        ConvolutionalMaker *biased(bint _biased) except +
+        ConvolutionalMaker *linear() except +
+        ConvolutionalMaker *tanh() except +
+        ConvolutionalMaker *sigmoid() except +
+        ConvolutionalMaker *relu() except +
         @staticmethod
-        ConvolutionalMaker *instance()
+        ConvolutionalMaker *instance() except +
 
 cdef extern from "PoolingMaker.h":
     cdef cppclass PoolingMaker(LayerMaker2):
-        PoolingMaker *poolingSize( int _poolingsize )
-        PoolingMaker *padZeros( int _padZeros )
+        PoolingMaker *poolingSize( int _poolingsize ) except +
+        PoolingMaker *padZeros( int _padZeros ) except +
         @staticmethod
-        PoolingMaker *instance()
+        PoolingMaker *instance() except +
 
 cdef extern from "LayerMaker.h":
     cdef cppclass SquareLossMaker(LayerMaker2):
         @staticmethod
-        SquareLossMaker *instance()
+        SquareLossMaker *instance() except +
 
 cdef extern from "LayerMaker.h":
     cdef cppclass SoftMaxMaker(LayerMaker2):
@@ -104,8 +104,8 @@ cdef extern from "LayerMaker.h":
 
 cdef extern from "InputLayerMaker.h":
     cdef cppclass InputLayerMaker[T](LayerMaker2):
-        InputLayerMaker *numPlanes( int _numPlanes )
-        InputLayerMaker *imageSize( int _imageSize )
+        InputLayerMaker *numPlanes( int _numPlanes ) except +
+        InputLayerMaker *imageSize( int _imageSize ) except +
         @staticmethod
-        InputLayerMaker *instance()
+        InputLayerMaker *instance() except +
 
