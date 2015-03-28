@@ -121,6 +121,10 @@ if osfamily == 'Windows' and sys.version_info[0] == 2:
     print('WARNING: python 2.x not really supported, since it needs visual studio 9; and visual studio 2009 doesnt support any c++11 features, which we would ideally prefer to be able to use')
     print('Probably possible to coerce ClConvolve to work with visual studio 9, and by extension with python 2.x, but maybe easier to just use python 3.x instead?')
 
+runtime_library_dirs = []
+if osfamily == 'Linux':
+    runtime_library_dirs= ['.']
+
 ext_modules = [
     Extension("libOpenCLHelper",
         sources = openclhelpersources,
@@ -138,7 +142,7 @@ ext_modules = [
         library_dirs = [ lib_build_dir() ],
         libraries = [ "OpenCLHelper" + get_so_suffix() ],
         define_macros = [('ClConvolve_EXPORTS',1)],
-        runtime_library_dirs=["."]
+        runtime_library_dirs=runtime_library_dirs
 #        language='c++'
     ),
     Extension("PyClConvolve",
@@ -149,7 +153,7 @@ ext_modules = [
               extra_compile_args=compile_options,
 #              extra_objects=['cClConvolve.pxd'],
               library_dirs = [lib_build_dir()],
-              runtime_library_dirs=["."],
+              runtime_library_dirs=runtime_library_dirs,
               language="c++"
     )
 ]
