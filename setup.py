@@ -114,6 +114,7 @@ ext_modules = [
         extra_compile_args = ['-std=c++11'],
         library_dirs = [ lib_build_dir() ],
         libraries = [ "OpenCLHelper" + get_so_suffix() ],
+        runtime_library_dirs=["."]
 #        language='c++'
     ),
     Extension("PyClConvolve",
@@ -122,6 +123,7 @@ ext_modules = [
               libraries=["ClConvolve" + get_so_suffix() ],
               extra_compile_args=['-std=c++11'],
               library_dirs = [lib_build_dir()],
+              runtime_library_dirs=["."],
               language="c++"
     )
 ]
@@ -142,6 +144,7 @@ setup(
   ],
   install_requires = ['Cython>=0.22','cogapp>=2.4','future>=0.14.3'],
   tests_require = ['nose>=1.3.4'],
+  scripts = ['test_clconvolve.py','test_lowlevel.py'],
  # modules = libraries,
   ext_modules = my_cythonize( ext_modules),
 )
