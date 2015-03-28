@@ -1,19 +1,22 @@
 PyClConvolve
 ============
 
-Python wrapper for ClConvolve
+Python wrapper for
+`ClConvolve <https://github.com/hughperkins/ClConvolve>`__
 
 How to use
 ==========
 
-See `test\_clconvolve.py <test_clconvolve.py>`__ for an example of:
+See
+`test\_clconvolve.py <https://github.com/hughperkins/PyClConvolve/blob/master/test_clconvolve.py>`__
+for an example of:
 
 -  creating a network, with several layers
 -  loading mnist data
 -  training the network using a higher-level interface (``NetLearner``)
 
 For examples of using lower-level entrypoints, see
-`test\_lowlevel.py <test_lowlevel.py>`__:
+`test\_lowlevel.py <https://github.com/hughperkins/PyClConvolve/blob/master/test_lowlevel.py>`__:
 
 -  creating layers directly
 -  running epochs and forward/backprop directly
@@ -21,12 +24,13 @@ For examples of using lower-level entrypoints, see
 Notes on how the wrapper works
 ==============================
 
--  `cClConvolve.pxd <cClConvolve.pxd>`__ contains the definitions of the
-   underlying ClConvolve c++ libraries classes
--  `PyClConvolve.pyx <PyClConvolve.pyx>`__ contains Cython wrapper
-   classes around the underlying c++ classes
--  `setup.py <setup.py>`__ is a setup file for compiling the
-   ``PyClConvolve.pyx`` Cython file
+-  `cClConvolve.pxd <https://github.com/hughperkins/PyClConvolve/blob/master/cClConvolve.pxd>`__
+   contains the definitions of the underlying ClConvolve c++ libraries
+   classes
+-  `PyClConvolve.pyx <https://github.com/hughperkins/PyClConvolve/blob/master/PyClConvolve.pyx>`__
+   contains Cython wrapper classes around the underlying c++ classes
+-  `setup.py <https://github.com/hughperkins/PyClConvolve/blob/master/setup.py>`__
+   is a setup file for compiling the ``PyClConvolve.pyx`` Cython file
 
 To build
 ========
