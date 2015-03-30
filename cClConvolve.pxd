@@ -7,6 +7,9 @@
 from libcpp.string cimport string
 from libcpp cimport bool
 
+cdef extern from "CyWrappers.h":
+    cdef void checkException( int *wasRaised, string *message )
+
 cdef extern from "NeuralNet.h":
     cdef cppclass NeuralNet:
         #pass
@@ -26,15 +29,15 @@ cdef extern from "NetdefToNet.h":
         @staticmethod
         bool createNetFromNetdef( NeuralNet *net, string netdef ) except +
 
-cdef extern from "NetLearner.h":
-    cdef cppclass NetLearner[T]:
-        NetLearner( NeuralNet *net ) except +
+cdef extern from "CyNetLearner.h":
+    cdef cppclass CyNetLearner[T]:
+        CyNetLearner( NeuralNet *net ) except +
         void setTrainingData( int Ntrain, T *trainData, int *trainLabels ) except +
         void setTestingData( int Ntest, T *testData, int *testLabels ) except +
         void setSchedule( int numEpochs ) except +
         void setDumpTimings( bool dumpTimings ) except +
         void setBatchSize( int batchSize ) except +
-        void learn( float learningRate ) except +
+        void learn( float learningRate ) nogil
         #void setSchedule( int numEpochs, int startEpoch )
         # VIRTUAL void addPostEpochAction( PostEpochAction *action );
         #void learn( float learningRate, float annealLearningRate )
@@ -108,4 +111,23 @@ cdef extern from "InputLayerMaker.h":
         InputLayerMaker *imageSize( int _imageSize ) except +
         @staticmethod
         InputLayerMaker *instance() except +
+
+cdef extern from "QLearner.h":
+    cdef cppclass QLearner:
+        QLearner( CyScenario *scenario, NeuralNet *net ) except +
+        void run() except +
+
+cdef extern from "CyScenario.h":
+    cdef cppclass CyScenario:
+        CyScenario(void *pyObject)
+        #void printScenario()
+        #void printQRepresentation(NeuralNet *net)
+        #int getPerceptionSize()
+        #int getPerceptionPlanes()
+        #void getPerception( float *perception )
+        #void reset()
+        #int getNumActions()
+        #float act( int index )
+        #bool hasFinished()
+
 

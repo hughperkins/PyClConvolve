@@ -179,11 +179,11 @@ ext_modules = [
 ##        language='c++'
 #    ),
     Extension("PyClConvolve",
-              sources=["PyClConvolve.pyx"] 
+              sources=["PyClConvolve.pyx", 'CyWrappers.cpp'] 
                 + openclhelpersources
                 + list(map( lambda name : 'ClConvolve/src/' + name, clconvolve_sources)), 
 #                glob.glob('ClConvolve/OpenCLHelper/*.h'),
-              include_dirs = ['ClConvolve/src','ClConvolve/OpenCLHelper'],
+              include_dirs = ['ClConvolve/src','ClConvolve/OpenCLHelper','ClConvolve/qlearning'],
 #              libraries=["ClConvolve" + get_so_suffix() ],
               extra_compile_args=compile_options,
         define_macros = [('ClConvolve_EXPORTS',1),('OpenCLHelper_EXPORTS',1)],
