@@ -4,6 +4,8 @@ PyClConvolve
 Python wrapper for
 `ClConvolve <https://github.com/hughperkins/ClConvolve>`__
 
+Note: this is migrated now into the ClConvolve repository.
+
 How to use
 ==========
 

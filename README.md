@@ -2,6 +2,8 @@
 
 Python wrapper for  [ClConvolve](https://github.com/hughperkins/ClConvolve)
 
+*Note: this is migrated now into the ClConvolve repository.*
+
 # How to use
 
 See [test_clconvolve.py](https://github.com/hughperkins/PyClConvolve/blob/master/test_clconvolve.py) for an example of:
